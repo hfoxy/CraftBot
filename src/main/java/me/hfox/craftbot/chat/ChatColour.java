@@ -1,11 +1,8 @@
-package me.hfox.craftbot;
+package me.hfox.craftbot.chat;
 
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.Ansi.Attribute;
 import org.fusesource.jansi.Ansi.Color;
-
-import java.util.EnumMap;
-import java.util.Map;
 
 import static org.fusesource.jansi.Ansi.ansi;
 
@@ -33,6 +30,8 @@ public enum ChatColour {
     UNDERLINE('n', 0x13, false, ansi().a(Attribute.UNDERLINE)),
     ITALIC('o', 0x14, false, ansi().a(Attribute.ITALIC)),
     RESET('r', 0x15, ansi().a(Attribute.RESET));
+
+    public static final char SPECIAL_TOKEN = '\u00A7';
 
     private final char key;
     private final int keyCode;
@@ -72,6 +71,16 @@ public enum ChatColour {
 
     public String getJansiReplacement() {
         return jansiReplacement;
+    }
+
+    public static ChatColour findByChar(char ch) {
+        for (ChatColour colour : values()) {
+            if (colour.getKey() == ch) {
+                return colour;
+            }
+        }
+
+        return null;
     }
 
     @Override

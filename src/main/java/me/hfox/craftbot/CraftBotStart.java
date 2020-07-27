@@ -1,16 +1,7 @@
 package me.hfox.craftbot;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioSocketChannel;
 import me.hfox.aphelion.Aphelion;
-import me.hfox.craftbot.protocol.handshake.client.PacketClientHandshake;
-import me.hfox.craftbot.protocol.handshake.client.ProtocolState;
-import me.hfox.craftbot.protocol.pipeline.ProtocolClientHandler;
-import me.hfox.craftbot.protocol.status.client.PacketClientStatusRequest;
+import me.hfox.craftbot.chat.ChatColour;
 import me.hfox.craftbot.terminal.CommandSender;
 import me.hfox.craftbot.terminal.Console;
 import me.hfox.craftbot.terminal.TerminalReader;

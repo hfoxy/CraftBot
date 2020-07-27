@@ -8,6 +8,7 @@ import me.hfox.craftbot.protocol.handshake.client.PacketClientHandshake;
 import me.hfox.craftbot.protocol.status.client.PacketClientStatusPing;
 import me.hfox.craftbot.protocol.status.server.PacketServerStatusPong;
 import me.hfox.craftbot.protocol.status.server.PacketServerStatusResponse;
+import me.hfox.craftbot.protocol.status.server.data.ServerListPingResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +60,11 @@ public class ServerConnection implements Connection {
     @Override
     public void handle(ServerPacket packet) {
         if (packet instanceof PacketServerStatusResponse) {
-            LOGGER.info("Received response from server: {}", ((PacketServerStatusResponse) packet).getResponse());
+            ServerListPingResponse response = ((PacketServerStatusResponse) packet).getResponse();
+            LOGGER.info("Protocol '{}' v{}", response.getVersion().getName(), response.getVersion().getProtocol());
+            LOGGER.info("Players {}/{}", response.getPlayers().getOnline(), response.getPlayers().getMax());
+            LOGGER.info("MOTD: '{}'", response.getDescription());
+
             writePacket(new PacketClientStatusPing(System.currentTimeMillis()));
         } else if (packet instanceof PacketServerStatusPong) {
             long payload = ((PacketServerStatusPong) packet).getPayload();

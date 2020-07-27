@@ -1,9 +1,12 @@
 package me.hfox.craftbot;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class CraftBotImpl implements CraftBot {
 
     private final String name;
     private final String version;
+    private final ObjectMapper mapper;
 
     public CraftBotImpl() {
         String name = CraftBot.class.getPackage().getImplementationTitle();
@@ -20,6 +23,8 @@ public class CraftBotImpl implements CraftBot {
 
         this.version = version;
         setBot(this);
+
+        this.mapper = new ObjectMapper();
     }
 
     @Override
@@ -30,6 +35,11 @@ public class CraftBotImpl implements CraftBot {
     @Override
     public String getVersion() {
         return version;
+    }
+
+    @Override
+    public ObjectMapper getMapper() {
+        return mapper;
     }
 
     public void setBot(CraftBot bot) {
