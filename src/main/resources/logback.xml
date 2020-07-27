@@ -9,7 +9,7 @@
         </encoder>
     </appender>
 
-    <logger name="me.hfox" level="debug" additivity="false">
+    <logger name="me.hfox" level="info" additivity="false">
         <appender-ref ref="CONSOLE"/>
     </logger>
 

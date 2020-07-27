@@ -1,4 +1,4 @@
-package me.hfox.craftbot.exception;
+package me.hfox.craftbot.exception.protocol;
 
 public class BotUnknownPacketException extends BotProtocolException {
 

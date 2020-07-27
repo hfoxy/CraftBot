@@ -1,12 +1,13 @@
 package me.hfox.craftbot.protocol.status.server.data;
 
 import me.hfox.craftbot.chat.ChatComponent;
+import me.hfox.craftbot.chat.StringSupportedChatComponent;
 
 public class ServerListPingResponse {
 
     private ServerListPingResponseVersion version;
     private ServerListPingResponsePlayers players;
-    private ChatComponent description;
+    private StringSupportedChatComponent description;
     private String favicon;
 
     public ServerListPingResponseVersion getVersion() {
@@ -25,11 +26,11 @@ public class ServerListPingResponse {
         this.players = players;
     }
 
-    public ChatComponent getDescription() {
+    public StringSupportedChatComponent getDescription() {
         return description;
     }
 
-    public void setDescription(ChatComponent description) {
+    public void setDescription(StringSupportedChatComponent description) {
         this.description = description;
     }
 

@@ -1,11 +1,8 @@
 package me.hfox.craftbot.protocol.status.server;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import me.hfox.craftbot.Bot;
-import me.hfox.craftbot.chat.ChatComponent;
 import me.hfox.craftbot.protocol.ServerPacket;
 import me.hfox.craftbot.protocol.status.server.data.ServerListPingResponse;
-import me.hfox.craftbot.protocol.status.server.data.ServerListPingResponseIgnoredDescription;
 import me.hfox.craftbot.protocol.stream.ProtocolBuffer;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -36,17 +33,7 @@ public class PacketServerStatusResponse implements ServerPacket {
         responseString = buffer.readString();
 
         try {
-
-            JSONObject jsonObject = new JSONObject(responseString);
-            if (jsonObject.get("description") instanceof String) {
-                response = Bot.getBot().getMapper().readValue(responseString, ServerListPingResponseIgnoredDescription.class);
-
-                ChatComponent component = new ChatComponent();
-                component.setText(jsonObject.getString("description"));
-                response.setDescription(component);
-            } else {
-                response = Bot.getBot().getMapper().readValue(responseString, ServerListPingResponse.class);
-            }
+            response = Bot.getBot().getMapper().readValue(responseString, ServerListPingResponse.class);
         } catch (IOException ex) {
             LOGGER.error("Unable to process response json", ex);
         }

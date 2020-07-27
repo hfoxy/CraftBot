@@ -28,7 +28,6 @@ public class PacketDecoder extends ByteToMessageDecoder {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        super.exceptionCaught(ctx, cause);
         LOGGER.error("oh no!", cause);
     }
 

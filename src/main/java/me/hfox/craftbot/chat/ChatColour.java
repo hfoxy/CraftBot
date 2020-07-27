@@ -83,6 +83,16 @@ public enum ChatColour {
         return null;
     }
 
+    public static ChatColour findByName(String name) {
+        for (ChatColour colour : values()) {
+            if (colour.name().equalsIgnoreCase(name)) {
+                return colour;
+            }
+        }
+
+        return null;
+    }
+
     @Override
     public String toString() {
         return jansiReplacement;

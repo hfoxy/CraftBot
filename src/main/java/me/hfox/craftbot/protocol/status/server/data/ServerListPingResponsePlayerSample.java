@@ -1,10 +1,14 @@
 package me.hfox.craftbot.protocol.status.server.data;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.UUID;
 
 public class ServerListPingResponsePlayerSample {
 
     private String name;
+
+    @JsonProperty("id")
     private String uuidString;
 
     public String getName() {

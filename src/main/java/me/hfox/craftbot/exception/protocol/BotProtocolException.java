@@ -1,4 +1,6 @@
-package me.hfox.craftbot.exception;
+package me.hfox.craftbot.exception.protocol;
+
+import me.hfox.craftbot.exception.BotException;
 
 public class BotProtocolException extends BotException {
 

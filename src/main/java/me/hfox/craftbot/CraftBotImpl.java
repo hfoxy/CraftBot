@@ -1,6 +1,10 @@
 package me.hfox.craftbot;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import me.hfox.craftbot.chat.ChatComponent;
+import me.hfox.craftbot.chat.ChatComponentDeserializer;
+import me.hfox.craftbot.chat.StringSupportedChatComponent;
 
 public class CraftBotImpl implements CraftBot {
 
@@ -25,6 +29,10 @@ public class CraftBotImpl implements CraftBot {
         setBot(this);
 
         this.mapper = new ObjectMapper();
+
+        SimpleModule module = new SimpleModule();
+        module.addDeserializer(StringSupportedChatComponent.class, new ChatComponentDeserializer());
+        mapper.registerModule(module);
     }
 
     @Override

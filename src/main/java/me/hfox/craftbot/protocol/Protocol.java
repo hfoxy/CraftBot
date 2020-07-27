@@ -1,7 +1,7 @@
 package me.hfox.craftbot.protocol;
 
 import me.hfox.craftbot.connection.Connection;
-import me.hfox.craftbot.exception.BotProtocolException;
+import me.hfox.craftbot.exception.protocol.BotProtocolException;
 import me.hfox.craftbot.protocol.handshake.client.ProtocolState;
 import me.hfox.craftbot.protocol.stream.ProtocolBuffer;
 

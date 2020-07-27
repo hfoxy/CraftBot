@@ -1,15 +1,19 @@
 package me.hfox.craftbot.protocol;
 
-import me.hfox.craftbot.exception.BotPacketRegistrationException;
-import me.hfox.craftbot.exception.BotProtocolException;
-import me.hfox.craftbot.exception.BotUnknownPacketException;
+import me.hfox.craftbot.exception.protocol.BotPacketRegistrationException;
+import me.hfox.craftbot.exception.protocol.BotProtocolException;
+import me.hfox.craftbot.exception.protocol.BotUnknownPacketException;
 import me.hfox.craftbot.protocol.handshake.client.ProtocolState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
 public abstract class RegistryProtocol {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RegistryProtocol.class);
 
     private final Map<Class<? extends Packet>, ProtocolState> packetStates;
 
@@ -67,6 +71,7 @@ public abstract class RegistryProtocol {
     protected Class<? extends ServerPacket> getServerClassById(ProtocolState state, int id) throws BotUnknownPacketException {
         Class<? extends ServerPacket> packetType = idToServerPacketsMap.get(state).get(id);
         if (packetType == null) {
+            LOGGER.info("Unknown Packet: {} #{} ({})", state, Integer.toHexString(id), id);
             throw new BotUnknownPacketException("Unknown Packet " + state.name() + " #" + id);
         }
 

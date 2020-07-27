@@ -1,12 +1,16 @@
 package me.hfox.craftbot.protocol;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import me.hfox.craftbot.connection.Connection;
-import me.hfox.craftbot.exception.BotPacketDecodingException;
-import me.hfox.craftbot.exception.BotProtocolException;
+import me.hfox.craftbot.exception.protocol.BotPacketDecodingException;
+import me.hfox.craftbot.exception.protocol.BotProtocolException;
 import me.hfox.craftbot.protocol.handshake.client.PacketClientHandshake;
 import me.hfox.craftbot.protocol.handshake.client.ProtocolState;
+import me.hfox.craftbot.protocol.login.client.PacketClientLoginStart;
+import me.hfox.craftbot.protocol.login.server.PacketServerLoginDisconnect;
+import me.hfox.craftbot.protocol.login.server.PacketServerLoginEncryptionRequest;
+import me.hfox.craftbot.protocol.login.server.PacketServerLoginSetCompression;
+import me.hfox.craftbot.protocol.login.server.PacketServerLoginSuccess;
+import me.hfox.craftbot.protocol.play.server.*;
 import me.hfox.craftbot.protocol.status.client.PacketClientStatusPing;
 import me.hfox.craftbot.protocol.status.client.PacketClientStatusRequest;
 import me.hfox.craftbot.protocol.status.server.PacketServerStatusPong;
@@ -15,6 +19,7 @@ import me.hfox.craftbot.protocol.stream.ProtocolBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
 public class JavaProtocol extends RegistryProtocol implements Protocol {
@@ -47,6 +52,23 @@ public class JavaProtocol extends RegistryProtocol implements Protocol {
 
         registerServer(ProtocolState.STATUS, 0x00, PacketServerStatusResponse.class);
         registerServer(ProtocolState.STATUS, 0x01, PacketServerStatusPong.class);
+
+        registerClient(ProtocolState.LOGIN, 0x00, PacketClientLoginStart.class);
+
+        registerServer(ProtocolState.LOGIN, 0x00, PacketServerLoginDisconnect.class);
+        registerServer(ProtocolState.LOGIN, 0x01, PacketServerLoginEncryptionRequest.class);
+        registerServer(ProtocolState.LOGIN, 0x02, PacketServerLoginSuccess.class);
+        registerServer(ProtocolState.LOGIN, 0x03, PacketServerLoginSetCompression.class);
+
+        registerServer(ProtocolState.PLAY, 0x00, PacketServerPlaySpawnEntity.class);
+        registerServer(ProtocolState.PLAY, 0x0E, PacketServerPlayServerDifficulty.class);
+        registerServer(ProtocolState.PLAY, 0x0F, PacketServerPlayChatMessage.class);
+        registerServer(ProtocolState.PLAY, 0x19, PacketServerPlayPluginMessage.class);
+        registerServer(ProtocolState.PLAY, 0x26, PacketServerPlayJoinGame.class);
+        registerServer(ProtocolState.PLAY, 0x32, PacketServerPlayPlayerAbilities.class);
+        registerServer(ProtocolState.PLAY, 0x38, PacketServerPlayDestroyEntities.class);
+        registerServer(ProtocolState.PLAY, 0x3D, PacketServerPlaySelectAdvancementTab.class);
+        registerServer(ProtocolState.PLAY, 0x40, PacketServerPlayHeldItemChange.class);
     }
 
     @Override
@@ -55,7 +77,12 @@ public class JavaProtocol extends RegistryProtocol implements Protocol {
         int packetId = info.getPacketId();
 
         buffer.writeVarInt(packetId);
-        packet.write(buffer);
+
+        try {
+            packet.write(buffer);
+        } catch (IOException ex) {
+            throw new BotProtocolException("Unable to write Packet", ex);
+        }
     }
 
     @Override
@@ -71,7 +98,12 @@ public class JavaProtocol extends RegistryProtocol implements Protocol {
             throw new BotPacketDecodingException("Unable to construct Packet", ex);
         }
 
-        packet.read(buffer);
+        try {
+            packet.read(buffer);
+        } catch (IOException ex) {
+            throw new BotProtocolException("Unable to read Packet", ex);
+        }
+
         return packet;
     }
 
