@@ -130,6 +130,9 @@ public class ServerConnection implements Connection {
         } else if (packet instanceof PacketServerPlayHeldItemChange) {
             PacketServerPlayHeldItemChange heldItemChange = (PacketServerPlayHeldItemChange) packet;
             LOGGER.info("Held item: {}", heldItemChange.getSlot());
+        } else if (packet instanceof PacketServerPlayPlayerPositionAndLook) {
+            PacketServerPlayPlayerPositionAndLook positionAndLook = (PacketServerPlayPlayerPositionAndLook) packet;
+            // TODO: confirm with teleport confirm matching teleportId
         }
     }
 

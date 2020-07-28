@@ -6,6 +6,8 @@ import me.hfox.craftbot.protocol.stream.ProtocolBuffer;
 
 import java.io.IOException;
 
+import static me.hfox.craftbot.utils.BitUtils.hasFlag;
+
 public class PacketServerPlayPlayerAbilities implements ServerPacket {
 
     private PlayerAbilities abilities;
@@ -30,10 +32,6 @@ public class PacketServerPlayPlayerAbilities implements ServerPacket {
         abilities = new PlayerAbilities(hasFlag(flags, 0x1), hasFlag(flags, 0x2), hasFlag(flags, 0x4), hasFlag(flags, 0x8));
         flyingSpeed = buffer.readFloat();
         fieldOfViewModifier = buffer.readFloat();
-    }
-
-    private static boolean hasFlag(byte flags, int bit) {
-        return (flags & bit) == bit;
     }
 
     public static class PlayerAbilities {

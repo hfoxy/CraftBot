@@ -63,12 +63,21 @@ public class JavaProtocol extends RegistryProtocol implements Protocol {
         registerServer(ProtocolState.PLAY, 0x00, PacketServerPlaySpawnEntity.class);
         registerServer(ProtocolState.PLAY, 0x0E, PacketServerPlayServerDifficulty.class);
         registerServer(ProtocolState.PLAY, 0x0F, PacketServerPlayChatMessage.class);
+        registerServer(ProtocolState.PLAY, 0x12, PacketServerPlayDeclareCommands.class);
         registerServer(ProtocolState.PLAY, 0x19, PacketServerPlayPluginMessage.class);
+        registerServer(ProtocolState.PLAY, 0x1C, PacketServerPlayEntityStatus.class);
         registerServer(ProtocolState.PLAY, 0x26, PacketServerPlayJoinGame.class);
         registerServer(ProtocolState.PLAY, 0x32, PacketServerPlayPlayerAbilities.class);
+        registerServer(ProtocolState.PLAY, 0x34, PacketServerPlayPlayerInfo.class);
+        registerServer(ProtocolState.PLAY, 0x36, PacketServerPlayPlayerPositionAndLook.class);
+        registerServer(ProtocolState.PLAY, 0x37, PacketServerPlayUnlockRecipes.class);
         registerServer(ProtocolState.PLAY, 0x38, PacketServerPlayDestroyEntities.class);
+        registerServer(ProtocolState.PLAY, 0x3C, PacketServerPlayEntityHeadLook.class);
         registerServer(ProtocolState.PLAY, 0x3D, PacketServerPlaySelectAdvancementTab.class);
+        registerServer(ProtocolState.PLAY, 0x3E, PacketServerPlayWorldBorder.class);
         registerServer(ProtocolState.PLAY, 0x40, PacketServerPlayHeldItemChange.class);
+        registerServer(ProtocolState.PLAY, 0x5B, PacketServerPlayDeclareRecipes.class);
+        registerServer(ProtocolState.PLAY, 0x5C, PacketServerPlayTags.class);
     }
 
     @Override
@@ -89,19 +98,27 @@ public class JavaProtocol extends RegistryProtocol implements Protocol {
     public ServerPacket read(Connection connection, ProtocolBuffer buffer) throws BotProtocolException {
         int packetId = buffer.readVarInt();
 
-        Class<? extends ServerPacket> packetType = getServerClassById(state, packetId);
+        Class<? extends ServerPacket> packetType = null;
         ServerPacket packet;
 
         try {
+            packetType = getServerClassById(state, packetId);
             packet = packetType.getDeclaredConstructor().newInstance();
+
+            packet.read(buffer);
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException ex) {
             throw new BotPacketDecodingException("Unable to construct Packet", ex);
-        }
-
-        try {
-            packet.read(buffer);
         } catch (IOException ex) {
             throw new BotProtocolException("Unable to read Packet", ex);
+        } finally {
+            if (buffer.readableBytes() > 0) {
+                String packetName = packetType == null ? "#" + Integer.toHexString(packetId) : packetType.getSimpleName();
+                LOGGER.warn("Reading of {} left {} bytes", packetName, buffer.readableBytes());
+
+                // read off the rest of the bytes so that it doesn't break subsequent packets
+                byte[] remaining = new byte[buffer.readableBytes()];
+                buffer.readBytes(remaining);
+            }
         }
 
         return packet;

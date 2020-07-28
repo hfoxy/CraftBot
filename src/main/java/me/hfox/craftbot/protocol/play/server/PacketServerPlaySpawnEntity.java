@@ -73,13 +73,13 @@ public class PacketServerPlaySpawnEntity implements ServerPacket {
     @Override
     public void read(ProtocolBuffer buffer) throws IOException, BotProtocolException {
         id = buffer.readVarInt();
-        uuid = new UUID(buffer.readLong(), buffer.readLong());
+        uuid = buffer.readUuid();
         type = buffer.readVarInt();
         x = buffer.readDouble();
         y = buffer.readDouble();
         z = buffer.readDouble();
-        pitch = buffer.readFloat();
-        yaw = buffer.readFloat();
+        pitch = buffer.readAngle();
+        yaw = buffer.readAngle();
         data = buffer.readInt();
         velocityX = buffer.readShort();
         velocityY = buffer.readShort();

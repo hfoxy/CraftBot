@@ -31,7 +31,7 @@ public class PacketInflater extends ByteToMessageDecoder {
 
             if (connection.getCompression().isEnabled()) {
                 int dlen = buffer.readVarInt(); // length of uncompressed data
-                LOGGER.info("Read uncompressed length as {}", dlen);
+                LOGGER.debug("Read uncompressed length as {}", dlen);
                 if (dlen >= connection.getCompression().getThreshold()) {
                     byte[] input = new byte[byteBuf.readableBytes()];
                     byteBuf.readBytes(input);                 // Converts buffer to an array of bytes

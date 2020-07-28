@@ -28,24 +28,24 @@ public class BasicClient implements Client {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
 
         try {
-            Bootstrap b = new Bootstrap();
-            b.group(workerGroup);
-            b.channel(NioSocketChannel.class);
-            b.option(ChannelOption.SO_KEEPALIVE, true);
+            Bootstrap bootstrap = new Bootstrap();
+            bootstrap.group(workerGroup);
+            bootstrap.channel(NioSocketChannel.class);
+            bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
 
             handler = new BasicClientProtocolHandler(this);
-            b.handler(handler);
-            LOGGER.debug("client init");
+            bootstrap.handler(handler);
+            LOGGER.info("client init");
 
             // Start the client.
-            ChannelFuture f = b.connect(host, port).sync();
-            LOGGER.debug("client started");
+            ChannelFuture f = bootstrap.connect(host, port).sync();
+            LOGGER.info("client started");
 
             onConnect(host, port);
 
             // Wait until the connection is closed.
             f.channel().closeFuture().sync();
-            LOGGER.debug("client stopped");
+            LOGGER.info("client stopped");
         } catch (Exception ex) {
             throw new BotConnectionException("Unable to connect", ex);
         } finally {
