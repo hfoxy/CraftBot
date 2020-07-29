@@ -2,8 +2,6 @@ package me.hfox.craftbot.protocol.play.server.data.command.properties;
 
 import me.hfox.craftbot.protocol.play.server.data.command.CommandNodeProperties;
 
-import java.util.Optional;
-
 public class BrigadierDoubleCommandNodeProperties implements CommandNodeProperties {
 
     private final double min;

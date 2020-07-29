@@ -1,11 +1,8 @@
 package me.hfox.craftbot.protocol.play.server;
 
 import me.hfox.craftbot.exception.protocol.BotProtocolException;
-import me.hfox.craftbot.player.Gamemode;
 import me.hfox.craftbot.protocol.ServerPacket;
 import me.hfox.craftbot.protocol.stream.ProtocolBuffer;
-import me.hfox.craftbot.world.Dimension;
-import me.hfox.craftbot.world.LevelType;
 
 import java.io.IOException;
 

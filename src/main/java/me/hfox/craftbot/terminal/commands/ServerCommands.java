@@ -1,11 +1,5 @@
 package me.hfox.craftbot.terminal.commands;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioSocketChannel;
 import me.hfox.aphelion.command.CommandContext;
 import me.hfox.aphelion.command.annotations.Command;
 import me.hfox.aphelion.exception.CommandException;
@@ -13,10 +7,6 @@ import me.hfox.aphelion.exception.CommandUsageException;
 import me.hfox.craftbot.connection.client.PlayClient;
 import me.hfox.craftbot.connection.client.StatusClient;
 import me.hfox.craftbot.exception.connection.BotConnectionException;
-import me.hfox.craftbot.protocol.handshake.client.PacketClientHandshake;
-import me.hfox.craftbot.protocol.handshake.client.ProtocolState;
-import me.hfox.craftbot.protocol.pipeline.ProtocolHandler;
-import me.hfox.craftbot.protocol.status.client.PacketClientStatusRequest;
 import me.hfox.craftbot.terminal.CommandSender;
 import me.hfox.craftbot.terminal.Level;
 

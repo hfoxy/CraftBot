@@ -4,11 +4,9 @@ import io.netty.buffer.Unpooled;
 import me.hfox.craftbot.protocol.stream.ProtocolBuffer;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.FileInputStream;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class PacketServerPlayDeclareRecipesTest {
 

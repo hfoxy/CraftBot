@@ -2,7 +2,7 @@ package me.hfox.craftbot.protocol.play.server;
 
 import me.hfox.craftbot.exception.protocol.BotProtocolException;
 import me.hfox.craftbot.protocol.ServerPacket;
-import me.hfox.craftbot.protocol.play.server.data.*;
+import me.hfox.craftbot.protocol.play.server.data.SlotData;
 import me.hfox.craftbot.protocol.play.server.data.recipe.*;
 import me.hfox.craftbot.protocol.stream.ProtocolBuffer;
 import me.hfox.craftbot.world.RecipeType;

@@ -4,7 +4,6 @@ import me.hfox.craftbot.Bot;
 import me.hfox.craftbot.protocol.ServerPacket;
 import me.hfox.craftbot.protocol.status.server.data.ServerListPingResponse;
 import me.hfox.craftbot.protocol.stream.ProtocolBuffer;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

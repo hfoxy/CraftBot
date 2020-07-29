@@ -1,6 +1,5 @@
 package me.hfox.craftbot.entity.living.mob;
 
-import me.hfox.craftbot.entity.living.mob.Golem;
 import me.hfox.craftbot.world.Direction;
 import me.hfox.craftbot.world.Location;
 

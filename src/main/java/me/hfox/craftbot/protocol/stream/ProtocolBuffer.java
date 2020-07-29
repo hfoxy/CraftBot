@@ -5,9 +5,9 @@ import me.hfox.craftbot.Bot;
 import me.hfox.craftbot.chat.ChatComponent;
 import me.hfox.craftbot.chat.StringSupportedChatComponent;
 import me.hfox.craftbot.nbt.*;
+import me.hfox.craftbot.protocol.play.server.data.SlotData;
 import me.hfox.craftbot.protocol.play.server.data.player.PlayerInfoProperty;
 import me.hfox.craftbot.protocol.play.server.data.recipe.IngredientData;
-import me.hfox.craftbot.protocol.play.server.data.SlotData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,6 +1,5 @@
 package me.hfox.craftbot.protocol.status.server.data;
 
-import me.hfox.craftbot.chat.ChatComponent;
 import me.hfox.craftbot.chat.StringSupportedChatComponent;
 
 public class ServerListPingResponse {

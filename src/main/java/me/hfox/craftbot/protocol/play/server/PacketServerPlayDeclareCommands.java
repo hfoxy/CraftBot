@@ -1,17 +1,13 @@
 package me.hfox.craftbot.protocol.play.server;
 
 import me.hfox.craftbot.exception.command.BotUnknownCommandParserException;
-import me.hfox.craftbot.exception.protocol.BotProtocolException;
 import me.hfox.craftbot.protocol.ServerPacket;
 import me.hfox.craftbot.protocol.play.server.data.command.*;
 import me.hfox.craftbot.protocol.play.server.data.command.properties.*;
 import me.hfox.craftbot.protocol.play.server.data.command.properties.BrigadierStringCommandNodeProperties.BrigadierStringCommandNodePropertiesType;
 import me.hfox.craftbot.protocol.stream.ProtocolBuffer;
-import me.hfox.craftbot.utils.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 import static me.hfox.craftbot.protocol.play.server.data.command.CommandNodeType.ARGUMENT;
 import static me.hfox.craftbot.protocol.play.server.data.command.CommandNodeType.LITERAL;

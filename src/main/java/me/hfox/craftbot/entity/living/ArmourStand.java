@@ -1,6 +1,5 @@
 package me.hfox.craftbot.entity.living;
 
-import me.hfox.craftbot.entity.living.LivingEntity;
 import me.hfox.craftbot.world.Rotation;
 
 public interface ArmourStand extends LivingEntity {
