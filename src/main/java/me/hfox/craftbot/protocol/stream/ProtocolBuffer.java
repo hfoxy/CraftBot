@@ -171,45 +171,65 @@ public class ProtocolBuffer extends NestedBuffer {
     }
 
     public Tag readTag() {
-        return readTag(false);
-    }
-
-    public Tag readTag(boolean list) {
-        // return new NBTInputStream(new ByteBufInputStream(this)).readTag(512).getTag();
         byte typeId = readByte();
         TagType type = TagType.values()[typeId];
         LOGGER.debug("Read typeId as {} ({})", type, typeId);
+        return readTag(type);
+    }
 
+    public Tag readTag(TagType type) {
+        return readTag(type, false);
+    }
+
+    public Tag readTag(TagType type, boolean list) {
         String name;
         switch (type) {
             case END:
                 return new TagEnd();
             case BYTE:
-                break;
+                name = readTagName(list);
+                return new TagByte(name, readByte());
             case SHORT:
-                break;
+                name = readTagName(list);
+                return new TagShort(name, readShort());
             case INT:
                 name = readTagName(list);
                 return new TagInt(name, readInt());
             case LONG:
-                break;
+                name = readTagName(list);
+                return new TagLong(name, readLong());
             case FLOAT:
-                break;
+                name = readTagName(list);
+                return new TagFloat(name, readFloat());
             case DOUBLE:
-                break;
+                name = readTagName(list);
+                return new TagDouble(name, readDouble());
             case BYTE_ARRAY:
-                break;
+                name = readTagName(list);
+                byte[] byteArray = new byte[readInt()];
+                readBytes(byteArray);
+                return new TagByteArray(name, byteArray);
             case STRING:
-                break;
+                name = readTagName(list);
+                return new TagString(name, readString(readShort()));
             case LIST:
-                break;
+                name = readTagName(list);
+                int listTypeId = readByte();
+                TagType listType = TagType.values()[listTypeId];
+
+                Tag[] listContent = new Tag[readInt()];
+                for (int i = 0; i < listContent.length; i++) {
+                    listContent[i] = readTag(listType, true);
+                }
+
+                return new TagList(name, listType, listContent);
             case COMPOUND:
                 name = readTagName(list);
 
                 List<Tag> tagList = new ArrayList<>();
 
                 while (true) {
-                    Tag read = readTag(false);
+                    Tag read = readTag();
                     tagList.add(read);
                     LOGGER.debug("Added {} ('{}') to compound ('{}')", read, read.getName(), name);
 
@@ -226,9 +246,21 @@ public class ProtocolBuffer extends NestedBuffer {
 
                 return new TagCompound(name, tags);
             case INT_ARRAY:
-                break;
+                name = readTagName(list);
+                int[] intArray = new int[readInt()];
+                for (int i = 0; i < intArray.length; i++) {
+                    intArray[i] = readInt();
+                }
+
+                return new TagIntArray(name, intArray);
             case LONG_ARRAY:
-                break;
+                name = readTagName(list);
+                long[] longArray = new long[readInt()];
+                for (int i = 0; i < longArray.length; i++) {
+                    longArray[i] = readLong();
+                }
+
+                return new TagLongArray(name, longArray);
         }
 
         throw new BotUnknownTagTypeException(type.name());

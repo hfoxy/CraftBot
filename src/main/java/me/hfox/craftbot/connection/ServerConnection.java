@@ -13,6 +13,7 @@ import me.hfox.craftbot.protocol.login.server.PacketServerLoginDisconnect;
 import me.hfox.craftbot.protocol.login.server.PacketServerLoginEncryptionRequest;
 import me.hfox.craftbot.protocol.login.server.PacketServerLoginSetCompression;
 import me.hfox.craftbot.protocol.login.server.PacketServerLoginSuccess;
+import me.hfox.craftbot.protocol.play.client.PacketClientPlayKeepAlive;
 import me.hfox.craftbot.protocol.play.server.*;
 import me.hfox.craftbot.protocol.status.client.PacketClientStatusPing;
 import me.hfox.craftbot.protocol.status.server.PacketServerStatusPong;
@@ -68,7 +69,7 @@ public class ServerConnection implements Connection {
 
     @Override
     public void handle(ServerPacket packet) {
-        LOGGER.info("Received {}", packet.getClass().getSimpleName());
+        LOGGER.debug("Received {}", packet.getClass().getSimpleName());
 
         if (packet instanceof PacketServerStatusResponse) {
             ServerListPingResponse response = ((PacketServerStatusResponse) packet).getResponse();
@@ -99,6 +100,8 @@ public class ServerConnection implements Connection {
             ChatComponent reason = ((PacketServerLoginDisconnect) packet).getReason();
             LOGGER.info("Disconnected: '{}'", reason);
             disconnect();
+        } else if (packet instanceof PacketServerPlayKeepAlive) {
+            writePacket(new PacketClientPlayKeepAlive(((PacketServerPlayKeepAlive) packet).getKeepAliveId()));
         } else if (packet instanceof PacketServerPlayJoinGame) {
             PacketServerPlayJoinGame joinGame = (PacketServerPlayJoinGame) packet;
             LOGGER.info("Joining game...");

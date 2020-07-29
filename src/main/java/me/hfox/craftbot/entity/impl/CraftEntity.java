@@ -1,6 +1,7 @@
 package me.hfox.craftbot.entity.impl;
 
 import me.hfox.craftbot.chat.ChatComponent;
+import me.hfox.craftbot.entity.BoundingBox;
 import me.hfox.craftbot.entity.Entity;
 import me.hfox.craftbot.entity.EntityType;
 import me.hfox.craftbot.entity.data.Pose;
@@ -54,6 +55,11 @@ public class CraftEntity implements Entity {
     @Override
     public EntityType getEntityType() {
         return entityType;
+    }
+
+    @Override
+    public BoundingBox getBoundingBox() {
+        return new BoundingBox(0, 0, 0);
     }
 
     @Override

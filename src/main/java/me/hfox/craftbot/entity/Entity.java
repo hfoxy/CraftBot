@@ -14,6 +14,8 @@ public interface Entity {
 
     EntityType getEntityType();
 
+    BoundingBox getBoundingBox();
+
     boolean isOnFire();
 
     void setOnFire(boolean onFire);
