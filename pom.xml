@@ -43,7 +43,7 @@
             <version>3.16.0</version>
         </dependency>
         <dependency>
-            <groupId>me.hfox</groupId>
+            <groupId>com.github.hfoxy.Aphelion</groupId>
             <artifactId>aphelion-core</artifactId>
             <version>1.1.5</version>
         </dependency>
