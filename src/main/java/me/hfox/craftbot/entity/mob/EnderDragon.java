@@ -1,7 +1,6 @@
 package me.hfox.craftbot.entity.mob;
 
-import me.hfox.craftbot.entity.DragonPhase;
-import me.hfox.craftbot.entity.mob.Mob;
+import me.hfox.craftbot.entity.data.DragonPhase;
 
 public interface EnderDragon extends Mob {
 

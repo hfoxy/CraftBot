@@ -1,5 +1,7 @@
 package me.hfox.craftbot.entity;
 
+import me.hfox.craftbot.entity.data.DisplayedSkinParts;
+import me.hfox.craftbot.entity.data.Hand;
 import me.hfox.craftbot.nbt.Tag;
 
 public interface Player extends LivingEntity {

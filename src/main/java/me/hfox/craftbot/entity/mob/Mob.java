@@ -1,6 +1,6 @@
 package me.hfox.craftbot.entity.mob;
 
-import me.hfox.craftbot.entity.Hand;
+import me.hfox.craftbot.entity.data.Hand;
 import me.hfox.craftbot.entity.LivingEntity;
 
 public interface Mob extends LivingEntity {

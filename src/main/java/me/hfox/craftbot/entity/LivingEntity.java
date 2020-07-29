@@ -1,5 +1,6 @@
 package me.hfox.craftbot.entity;
 
+import me.hfox.craftbot.entity.data.ActiveHand;
 import me.hfox.craftbot.world.Location;
 
 import java.util.Optional;

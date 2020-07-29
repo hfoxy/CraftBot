@@ -1,5 +1,7 @@
 package me.hfox.craftbot.entity;
 
+import me.hfox.craftbot.entity.data.BoatType;
+
 public interface Boat extends Entity {
 
     int getTimeSinceLastHit();

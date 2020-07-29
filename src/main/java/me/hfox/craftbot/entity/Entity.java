@@ -1,6 +1,7 @@
 package me.hfox.craftbot.entity;
 
 import me.hfox.craftbot.chat.ChatComponent;
+import me.hfox.craftbot.entity.data.Pose;
 
 import java.util.Optional;
 
