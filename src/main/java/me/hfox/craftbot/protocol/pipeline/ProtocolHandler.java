@@ -19,7 +19,7 @@ public class ProtocolHandler extends ChannelInitializer<SocketChannel> {
     }
 
     protected Connection createConnection(SocketChannel channel) throws BotProtocolException {
-        return new ServerConnection(channel, new JavaProtocol());
+        return new ServerConnection(null, channel, new JavaProtocol());
     }
 
     @Override
@@ -47,7 +47,7 @@ public class ProtocolHandler extends ChannelInitializer<SocketChannel> {
         // decode
 
         channel.pipeline().addLast("deflator", new PacketDeflator(connection));
-        channel.pipeline().addLast("prepender", new PacketPrepender());
+        channel.pipeline().addLast("prepender", new PacketPrepender(connection));
         channel.pipeline().addLast("encoder", new PacketEncoder(connection));
     }
 

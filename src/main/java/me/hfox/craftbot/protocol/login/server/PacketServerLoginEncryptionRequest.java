@@ -24,8 +24,8 @@ public class PacketServerLoginEncryptionRequest implements ServerPacket {
     @Override
     public void read(ProtocolBuffer buffer) {
         serverId = buffer.readString();
-        publicKey = buffer.readBytes(buffer.readVarInt()).array();
-        verifyToken = buffer.readBytes(buffer.readVarInt()).array();
+        publicKey = buffer.readByteArray();
+        verifyToken = buffer.readByteArray();
     }
 
 }

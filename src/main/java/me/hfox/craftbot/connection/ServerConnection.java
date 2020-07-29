@@ -2,8 +2,10 @@ package me.hfox.craftbot.connection;
 
 import io.netty.channel.socket.SocketChannel;
 import me.hfox.craftbot.chat.ChatComponent;
+import me.hfox.craftbot.connection.client.Client;
 import me.hfox.craftbot.connection.compression.Compression;
 import me.hfox.craftbot.connection.compression.CompressionImpl;
+import me.hfox.craftbot.entity.data.Hand;
 import me.hfox.craftbot.protocol.ClientPacket;
 import me.hfox.craftbot.protocol.Protocol;
 import me.hfox.craftbot.protocol.ServerPacket;
@@ -13,12 +15,18 @@ import me.hfox.craftbot.protocol.login.server.PacketServerLoginDisconnect;
 import me.hfox.craftbot.protocol.login.server.PacketServerLoginEncryptionRequest;
 import me.hfox.craftbot.protocol.login.server.PacketServerLoginSetCompression;
 import me.hfox.craftbot.protocol.login.server.PacketServerLoginSuccess;
+import me.hfox.craftbot.protocol.play.client.PacketClientPlayClientSettings;
+import me.hfox.craftbot.protocol.play.client.PacketClientPlayClientStatus;
 import me.hfox.craftbot.protocol.play.client.PacketClientPlayKeepAlive;
+import me.hfox.craftbot.protocol.play.client.PacketClientPlayTeleportConfirm;
+import me.hfox.craftbot.protocol.play.client.data.ChatMode;
+import me.hfox.craftbot.protocol.play.client.data.ClientStatusAction;
 import me.hfox.craftbot.protocol.play.server.*;
 import me.hfox.craftbot.protocol.status.client.PacketClientStatusPing;
 import me.hfox.craftbot.protocol.status.server.PacketServerStatusPong;
 import me.hfox.craftbot.protocol.status.server.PacketServerStatusResponse;
 import me.hfox.craftbot.protocol.status.server.data.ServerListPingResponse;
+import me.hfox.craftbot.world.Location;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,12 +34,14 @@ public class ServerConnection implements Connection {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerConnection.class);
 
+    private final Client client;
     private final SocketChannel channel;
     private final Compression compression;
 
     private Protocol protocol;
 
-    public ServerConnection(SocketChannel channel, Protocol protocol) {
+    public ServerConnection(Client client, SocketChannel channel, Protocol protocol) {
+        this.client = client;
         this.channel = channel;
         this.compression = new CompressionImpl();
         this.protocol = protocol;
@@ -44,6 +54,11 @@ public class ServerConnection implements Connection {
     @Override
     public Compression getCompression() {
         return compression;
+    }
+
+    @Override
+    public boolean isConnected() {
+        return channel.isOpen();
     }
 
     @Override
@@ -137,7 +152,37 @@ public class ServerConnection implements Connection {
             LOGGER.info("Held item: {}", heldItemChange.getSlot());
         } else if (packet instanceof PacketServerPlayPlayerPositionAndLook) {
             PacketServerPlayPlayerPositionAndLook positionAndLook = (PacketServerPlayPlayerPositionAndLook) packet;
-            // TODO: confirm with teleport confirm matching teleportId
+
+            double x = positionAndLook.getX();
+            if (positionAndLook.isxRelative()) {
+                x = client.getClientPlayer().getLocation().getX() + positionAndLook.getX();
+            }
+
+            double y = positionAndLook.getY();
+            if (positionAndLook.isxRelative()) {
+                y = client.getClientPlayer().getLocation().getY() + positionAndLook.getY();
+            }
+
+            double z = positionAndLook.getZ();
+            if (positionAndLook.isxRelative()) {
+                z = client.getClientPlayer().getLocation().getZ() + positionAndLook.getZ();
+            }
+
+            client.getClientPlayer().setLocation(new Location(x, y, z, positionAndLook.getYaw(), positionAndLook.getPitch()));
+            writePacket(new PacketClientPlayTeleportConfirm(positionAndLook.getTeleportId()));
+        } else if (packet instanceof PacketServerPlayDisconnect) {
+            PacketServerPlayDisconnect disconnect = (PacketServerPlayDisconnect) packet;
+            LOGGER.info("Disconnected by server: {}", disconnect.getReason());
+        } else if (packet instanceof PacketServerPlayPlayerInfo) {
+            PacketServerPlayPlayerInfo playerInfo = (PacketServerPlayPlayerInfo) packet;
+            writePacket(new PacketClientPlayClientStatus(ClientStatusAction.RESPAWN));
+            writePacket(new PacketClientPlayClientSettings("en_GB", 16, ChatMode.ENABLED, true, 0xFF, Hand.RIGHT));
+
+            if (client != null) {
+                client.completeLogin();
+            }
+        } else if (packet instanceof PacketServerPlayChangeGameState) {
+            LOGGER.info("Told to change game state: {}", packet);
         }
     }
 

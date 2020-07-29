@@ -40,6 +40,16 @@ public class ProtocolBuffer extends NestedBuffer {
         super(buffer);
     }
 
+    public int getVarIntLength(int var) {
+        for (int j = 1; j < 5; ++j) {
+            if ((var & -1 << j * 7) == 0) {
+                return j;
+            }
+        }
+
+        return 5;
+    }
+
     public int readVarInt() {
         int numRead = 0;
         int result = 0;
@@ -399,6 +409,12 @@ public class ProtocolBuffer extends NestedBuffer {
 
     public Pose readPose() {
         return Pose.values()[readVarInt()];
+    }
+
+    public byte[] readByteArray() {
+        byte[] data = new byte[readVarInt()];
+        readBytes(data);
+        return data;
     }
 
 }

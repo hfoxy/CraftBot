@@ -11,6 +11,8 @@ public interface Connection {
 
     Compression getCompression();
 
+    boolean isConnected();
+
     void disconnect();
 
     void writePacket(ClientPacket packet);

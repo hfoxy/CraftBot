@@ -12,6 +12,7 @@ public class ChatComponent {
     private String text;
     private String translate;
     private String insertion;
+    private List<String> with;
 
     private boolean bold;
     private boolean italic;
@@ -51,6 +52,14 @@ public class ChatComponent {
 
     public void setInsertion(String insertion) {
         this.insertion = insertion;
+    }
+
+    public List<String> getWith() {
+        return with;
+    }
+
+    public void setWith(List<String> with) {
+        this.with = with;
     }
 
     public boolean isBold() {
@@ -156,6 +165,10 @@ public class ChatComponent {
 
         if (text != null) {
             builder.append(text);
+        } else if (translate != null && with != null) {
+            for (String w : with) {
+                builder.append(w);
+            }
         } else if (translate != null) {
             builder.append(translate);
         }

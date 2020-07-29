@@ -1,6 +1,7 @@
 package me.hfox.craftbot.connection.client;
 
 import me.hfox.craftbot.connection.Connection;
+import me.hfox.craftbot.entity.ClientPlayer;
 import me.hfox.craftbot.exception.connection.BotConnectionException;
 
 public interface Client {
@@ -12,5 +13,11 @@ public interface Client {
     void connect(String host, int port) throws BotConnectionException;
 
     Connection getConnection();
+
+    default void completeLogin() {
+        // nothing
+    }
+
+    ClientPlayer getClientPlayer();
 
 }
