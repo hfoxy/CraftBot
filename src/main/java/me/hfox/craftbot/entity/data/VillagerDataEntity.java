@@ -6,24 +6,24 @@ public interface VillagerDataEntity {
 
     void setData(VillagerData data);
 
-    default int getType() {
+    default VillagerType getType() {
         return getData().getType();
     }
 
-    default void setType(int type) {
+    default void setType(VillagerType type) {
         getData().setType(type);
     }
 
-    default int getProfession() {
-        return getData().getType();
+    default VillagerProfession getProfession() {
+        return getData().getProfession();
     }
 
-    default void setProfession(int profession) {
+    default void setProfession(VillagerProfession profession) {
         getData().setProfession(profession);
     }
 
     default int getLevel() {
-        return getData().getType();
+        return getData().getLevel();
     }
 
     default void setLevel(int level) {

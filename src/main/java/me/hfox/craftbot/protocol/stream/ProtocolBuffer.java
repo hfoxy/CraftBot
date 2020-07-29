@@ -4,10 +4,19 @@ import io.netty.buffer.ByteBuf;
 import me.hfox.craftbot.Bot;
 import me.hfox.craftbot.chat.ChatComponent;
 import me.hfox.craftbot.chat.StringSupportedChatComponent;
+import me.hfox.craftbot.entity.data.Pose;
+import me.hfox.craftbot.entity.data.VillagerData;
+import me.hfox.craftbot.entity.data.VillagerProfession;
+import me.hfox.craftbot.entity.data.VillagerType;
+import me.hfox.craftbot.entity.particle.Particle;
+import me.hfox.craftbot.exception.nbt.BotUnknownTagTypeException;
 import me.hfox.craftbot.nbt.*;
 import me.hfox.craftbot.protocol.play.server.data.SlotData;
 import me.hfox.craftbot.protocol.play.server.data.player.PlayerInfoProperty;
 import me.hfox.craftbot.protocol.play.server.data.recipe.IngredientData;
+import me.hfox.craftbot.world.Direction;
+import me.hfox.craftbot.world.Location;
+import me.hfox.craftbot.world.Rotation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +24,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -59,6 +69,15 @@ public class ProtocolBuffer extends NestedBuffer {
 
             writeByte(temp);
         } while (value != 0);
+    }
+
+    public Optional<Integer> readVarIntOptional() {
+        int value = readVarInt();
+        if (value == 0) {
+            return Optional.empty();
+        }
+
+        return Optional.of(value - 1);
     }
 
     public long readVarLong() {
@@ -123,7 +142,7 @@ public class ProtocolBuffer extends NestedBuffer {
         return new IngredientData(items);
     }
 
-    public SlotData readSlot() throws IOException {
+    public SlotData readSlot() {
         boolean present = readBoolean();
 
         if (present) {
@@ -137,7 +156,7 @@ public class ProtocolBuffer extends NestedBuffer {
         return new SlotData();
     }
 
-    public TagSet readTags() throws IOException {
+    public TagSet readTags() {
         List<Tag> tags = new ArrayList<>();
         while (true) {
             Tag read = readTag();
@@ -151,11 +170,11 @@ public class ProtocolBuffer extends NestedBuffer {
         return new TagSet(tags);
     }
 
-    public Tag readTag() throws IOException {
+    public Tag readTag() {
         return readTag(false);
     }
 
-    public Tag readTag(boolean list) throws IOException {
+    public Tag readTag(boolean list) {
         // return new NBTInputStream(new ByteBufInputStream(this)).readTag(512).getTag();
         byte typeId = readByte();
         TagType type = TagType.values()[typeId];
@@ -212,7 +231,7 @@ public class ProtocolBuffer extends NestedBuffer {
                 break;
         }
 
-        throw new IOException("nope");
+        throw new BotUnknownTagTypeException(type.name());
     }
 
     private String readTagName(boolean list) {
@@ -237,12 +256,28 @@ public class ProtocolBuffer extends NestedBuffer {
         writeLong(uuid.getLeastSignificantBits());
     }
 
+    public Optional<UUID> readUuidOptional() {
+        if (readBoolean()) {
+            return Optional.of(readUuid());
+        }
+
+        return Optional.empty();
+    }
+
     public ChatComponent readChat() throws IOException {
         return Bot.getBot().getMapper().readValue(readString(), StringSupportedChatComponent.class);
     }
 
     public void writeChat(ChatComponent chat) {
         throw new UnsupportedOperationException("not done yet");
+    }
+
+    public Optional<ChatComponent> readChatOptional() throws IOException {
+        if (readBoolean()) {
+            return Optional.of(readChat());
+        }
+
+        return Optional.empty();
     }
 
     public PlayerInfoProperty readPlayerInfoProperty() throws IOException {
@@ -266,6 +301,72 @@ public class ProtocolBuffer extends NestedBuffer {
     public void writeAngle(float value) {
         byte b = (byte) ((value / 180) * -128);
         writeByte(b);
+    }
+
+    public int readBlockId() {
+        return readVarInt();
+    }
+
+    public Optional<Integer> readBlockIdOptional() {
+        int value = readVarInt();
+        if (value == 0) {
+            return Optional.empty();
+        }
+
+        return Optional.of(value);
+    }
+
+    public Rotation readRotation() {
+        return new Rotation(readFloat(), readFloat(), readFloat());
+    }
+
+    public Location readPosition() {
+        long value = readLong();
+        int x = (int) (value >> 38);
+        int y = (int) (value & 0xFFF);
+        int z = (int) (value << 26 >> 38);
+
+        if (x >= Math.pow(2, 25)) {
+            x -= Math.pow(2, 26);
+        }
+
+        if (y >= Math.pow(2, 11)) {
+            y -= Math.pow(2, 12);
+        }
+
+        if (z >= Math.pow(2, 25)) {
+            z -= Math.pow(2, 26);
+        }
+
+        return new Location(x, y, z);
+    }
+
+    public Optional<Location> readPositionOptional() {
+        if (readBoolean()) {
+            return Optional.of(readPosition());
+        }
+
+        return Optional.empty();
+    }
+
+    public Direction readDirection() {
+        return Direction.findById(readVarInt());
+    }
+
+    public Particle readParticle() {
+        throw new UnsupportedOperationException("not done yet");
+    }
+
+    public VillagerData readVillagerData() {
+        return new VillagerData(
+                VillagerType.findById(readVarInt()),
+                VillagerProfession.findById(readVarInt()),
+                readVarInt()
+        );
+    }
+
+    public Pose readPose() {
+        return Pose.values()[readVarInt()];
     }
 
 }

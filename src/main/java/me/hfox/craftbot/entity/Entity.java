@@ -4,8 +4,15 @@ import me.hfox.craftbot.chat.ChatComponent;
 import me.hfox.craftbot.entity.data.Pose;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public interface Entity {
+
+    int getId();
+
+    UUID getUniqueId();
+
+    EntityType getEntityType();
 
     boolean isOnFire();
 
@@ -23,6 +30,10 @@ public interface Entity {
     boolean isSprinting();
 
     void setSprinting(boolean sprinting);
+
+    boolean isSwimming();
+
+    void setSwimming(boolean swimming);
 
     boolean isInvisible();
 
@@ -42,7 +53,7 @@ public interface Entity {
 
     Optional<ChatComponent> getCustomName();
 
-    void setCustomName(String customName);
+    void setCustomName(ChatComponent customName);
 
     boolean isCustomNameVisible();
 

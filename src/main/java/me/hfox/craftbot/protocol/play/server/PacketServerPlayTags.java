@@ -8,24 +8,24 @@ import java.io.IOException;
 
 public class PacketServerPlayTags implements ServerPacket {
 
-    private Tag[] blockTags;
-    private Tag[] itemTags;
-    private Tag[] fluidTags;
-    private Tag[] entityTags;
+    private TagData[] blockTags;
+    private TagData[] itemTags;
+    private TagData[] fluidTags;
+    private TagData[] entityTags;
 
-    public Tag[] getBlockTags() {
+    public TagData[] getBlockTags() {
         return blockTags;
     }
 
-    public Tag[] getItemTags() {
+    public TagData[] getItemTags() {
         return itemTags;
     }
 
-    public Tag[] getFluidTags() {
+    public TagData[] getFluidTags() {
         return fluidTags;
     }
 
-    public Tag[] getEntityTags() {
+    public TagData[] getEntityTags() {
         return entityTags;
     }
 
@@ -37,8 +37,8 @@ public class PacketServerPlayTags implements ServerPacket {
         entityTags = readTags(buffer);
     }
 
-    private Tag[] readTags(ProtocolBuffer buffer) {
-        Tag[] tags = new Tag[buffer.readVarInt()];
+    private TagData[] readTags(ProtocolBuffer buffer) {
+        TagData[] tags = new TagData[buffer.readVarInt()];
         for (int i = 0; i < tags.length; i++) {
             String name = buffer.readString();
             int[] entries = new int[buffer.readVarInt()];
@@ -46,18 +46,18 @@ public class PacketServerPlayTags implements ServerPacket {
                 entries[j] = buffer.readVarInt();
             }
 
-            tags[i] = new Tag(name, entries);
+            tags[i] = new TagData(name, entries);
         }
 
         return tags;
     }
 
-    public static class Tag {
+    public static class TagData {
 
         private final String name;
         private final int[] entries;
 
-        public Tag(String name, int[] entries) {
+        public TagData(String name, int[] entries) {
             this.name = name;
             this.entries = entries;
         }

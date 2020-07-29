@@ -76,6 +76,7 @@ public class JavaProtocol extends RegistryProtocol implements Protocol {
         registerServer(ProtocolState.PLAY, 0x3D, PacketServerPlaySelectAdvancementTab.class);
         registerServer(ProtocolState.PLAY, 0x3E, PacketServerPlayWorldBorder.class);
         registerServer(ProtocolState.PLAY, 0x40, PacketServerPlayHeldItemChange.class);
+        registerServer(ProtocolState.PLAY, 0x44, PacketServerPlayEntityMetadata.class);
         registerServer(ProtocolState.PLAY, 0x5B, PacketServerPlayDeclareRecipes.class);
         registerServer(ProtocolState.PLAY, 0x5C, PacketServerPlayTags.class);
     }
@@ -112,7 +113,7 @@ public class JavaProtocol extends RegistryProtocol implements Protocol {
             throw new BotProtocolException("Unable to read Packet", ex);
         } finally {
             if (buffer.readableBytes() > 0) {
-                String packetName = packetType == null ? "#" + Integer.toHexString(packetId) : packetType.getSimpleName();
+                String packetName = packetType == null ? state + "#" + Integer.toHexString(packetId) : packetType.getSimpleName();
                 LOGGER.warn("Reading of {} left {} bytes", packetName, buffer.readableBytes());
 
                 // read off the rest of the bytes so that it doesn't break subsequent packets

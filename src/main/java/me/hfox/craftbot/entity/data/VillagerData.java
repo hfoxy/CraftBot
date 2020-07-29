@@ -2,29 +2,29 @@ package me.hfox.craftbot.entity.data;
 
 public class VillagerData {
 
-    private int type;
-    private int profession;
+    private VillagerType type;
+    private VillagerProfession profession;
     private int level;
 
-    public VillagerData(int type, int profession, int level) {
+    public VillagerData(VillagerType type, VillagerProfession profession, int level) {
         this.type = type;
         this.profession = profession;
         this.level = level;
     }
 
-    public int getType() {
+    public VillagerType getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(VillagerType type) {
         this.type = type;
     }
 
-    public int getProfession() {
+    public VillagerProfession getProfession() {
         return profession;
     }
 
-    public void setProfession(int profession) {
+    public void setProfession(VillagerProfession profession) {
         this.profession = profession;
     }
 
