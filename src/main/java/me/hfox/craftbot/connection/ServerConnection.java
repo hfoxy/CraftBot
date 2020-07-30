@@ -86,6 +86,15 @@ public class ServerConnection implements Connection {
     public void handle(ServerPacket packet) {
         LOGGER.debug("Received {}", packet.getClass().getSimpleName());
 
+        /*if (!(packet instanceof PacketServerPlayEntityPosition)
+                && !(packet instanceof PacketServerPlayEntityHeadLook)
+                && !(packet instanceof PacketServerPlayEntityVelocity)
+                && !(packet instanceof PacketServerPlayEntityPositionAndRotation)
+                && !(packet instanceof PacketServerPlayEntityRotation)
+                && !(packet instanceof PacketServerPlayDestroyEntities)) {
+            LOGGER.info("Received {}", packet.getClass().getSimpleName());
+        }*/
+
         try {
             client.onReceive(packet);
         } catch (Throwable ex) {
@@ -113,7 +122,13 @@ public class ServerConnection implements Connection {
         } else if (packet instanceof PacketServerLoginSuccess) {
             LOGGER.info("Login success!");
             protocol.setState(ProtocolState.PLAY);
-            client.completeLogin();
+
+            try {
+                client.completeLogin();
+            } catch (Throwable ex) {
+                LOGGER.error("Unable to complete login", ex);
+            }
+
         } else if (packet instanceof PacketServerLoginSetCompression) {
             int threshold = ((PacketServerLoginSetCompression) packet).getThreshold();
             getCompression().enable(threshold);

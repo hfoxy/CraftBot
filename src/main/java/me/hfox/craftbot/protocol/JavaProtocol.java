@@ -62,6 +62,7 @@ public class JavaProtocol extends RegistryProtocol implements Protocol {
         registerServer(ProtocolState.LOGIN, 0x03, PacketServerLoginSetCompression.class);
 
         registerClient(ProtocolState.PLAY, 0x00, PacketClientPlayTeleportConfirm.class);
+        registerClient(ProtocolState.PLAY, 0x03, PacketClientPlayChatMessage.class);
         registerClient(ProtocolState.PLAY, 0x04, PacketClientPlayClientStatus.class);
         registerClient(ProtocolState.PLAY, 0x05, PacketClientPlayClientSettings.class);
         registerClient(ProtocolState.PLAY, 0x0F, PacketClientPlayKeepAlive.class);
@@ -72,6 +73,7 @@ public class JavaProtocol extends RegistryProtocol implements Protocol {
         registerServer(ProtocolState.PLAY, 0x00, PacketServerPlaySpawnEntity.class);
         registerServer(ProtocolState.PLAY, 0x03, PacketServerPlaySpawnLivingEntity.class);
         registerServer(ProtocolState.PLAY, 0x05, PacketServerPlaySpawnPlayer.class);
+        registerServer(ProtocolState.PLAY, 0x06, PacketServerPlayEntityAnimation.class);
         registerServer(ProtocolState.PLAY, 0x0C, PacketServerPlayBlockChange.class);
         registerServer(ProtocolState.PLAY, 0x0E, PacketServerPlayServerDifficulty.class);
         registerServer(ProtocolState.PLAY, 0x0F, PacketServerPlayChatMessage.class);
@@ -113,6 +115,7 @@ public class JavaProtocol extends RegistryProtocol implements Protocol {
         registerServer(ProtocolState.PLAY, 0x52, PacketServerPlaySoundEffect.class);
         registerServer(ProtocolState.PLAY, 0x53, PacketServerPlayStopSound.class);
         registerServer(ProtocolState.PLAY, 0x57, PacketServerPlayEntityTeleport.class);
+        registerServer(ProtocolState.PLAY, 0x58, PacketServerPlayAdvancements.class);
         registerServer(ProtocolState.PLAY, 0x59, PacketServerPlayEntityProperties.class);
         registerServer(ProtocolState.PLAY, 0x5B, PacketServerPlayDeclareRecipes.class);
         registerServer(ProtocolState.PLAY, 0x5C, PacketServerPlayTags.class);

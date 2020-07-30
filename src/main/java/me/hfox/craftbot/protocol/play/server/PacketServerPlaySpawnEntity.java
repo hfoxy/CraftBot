@@ -3,24 +3,23 @@ package me.hfox.craftbot.protocol.play.server;
 import me.hfox.craftbot.exception.protocol.BotProtocolException;
 import me.hfox.craftbot.protocol.ServerPacket;
 import me.hfox.craftbot.protocol.stream.ProtocolBuffer;
+import me.hfox.craftbot.world.Velocity;
 
 import java.io.IOException;
 import java.util.UUID;
 
 public class PacketServerPlaySpawnEntity implements ServerPacket {
 
-    private int id;
-    private UUID uuid;
-    private int type;
-    private double x;
-    private double y;
-    private double z;
-    private float pitch;
-    private float yaw;
-    private int data;
-    private short velocityX;
-    private short velocityY;
-    private short velocityZ;
+    protected int id;
+    protected UUID uuid;
+    protected int type;
+    protected double x;
+    protected double y;
+    protected double z;
+    protected float pitch;
+    protected float yaw;
+    protected int data;
+    protected Velocity velocity;
 
     public int getId() {
         return id;
@@ -58,32 +57,26 @@ public class PacketServerPlaySpawnEntity implements ServerPacket {
         return data;
     }
 
-    public short getVelocityX() {
-        return velocityX;
+    public Velocity getVelocity() {
+        return velocity;
     }
 
-    public short getVelocityY() {
-        return velocityY;
-    }
-
-    public short getVelocityZ() {
-        return velocityZ;
-    }
-
-    @Override
-    public void read(ProtocolBuffer buffer) throws IOException, BotProtocolException {
+    protected void readInfoAndXYZ(ProtocolBuffer buffer) {
         id = buffer.readVarInt();
         uuid = buffer.readUuid();
         type = buffer.readVarInt();
         x = buffer.readDouble();
         y = buffer.readDouble();
         z = buffer.readDouble();
+    }
+
+    @Override
+    public void read(ProtocolBuffer buffer) throws IOException, BotProtocolException {
+        readInfoAndXYZ(buffer);
         pitch = buffer.readAngle();
         yaw = buffer.readAngle();
         data = buffer.readInt();
-        velocityX = buffer.readShort();
-        velocityY = buffer.readShort();
-        velocityZ = buffer.readShort();
+        velocity = new Velocity(buffer.readShort(), buffer.readShort(), buffer.readShort());
     }
 
 }

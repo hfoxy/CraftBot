@@ -1,5 +1,7 @@
 package me.hfox.craftbot.entity.data;
 
+import me.hfox.craftbot.utils.ToStringBuilder;
+
 public class DisplayedSkinParts {
 
     private final boolean cape;
@@ -46,6 +48,11 @@ public class DisplayedSkinParts {
 
     public boolean isHat() {
         return hat;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.build(this).deepArray(true).parents(true).reflective(true).simpleName(true).toString();
     }
 
 }

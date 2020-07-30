@@ -17,7 +17,7 @@ public interface Entity {
 
     UUID getUniqueId();
 
-    EntityType getEntityType();
+    EntityType<?, ?> getEntityType();
 
     BoundingBox getBoundingBox();
 
@@ -85,5 +85,7 @@ public interface Entity {
     Velocity getVelocity();
 
     void setVelocity(Velocity velocity);
+
+    String getBriefInfo();
 
 }

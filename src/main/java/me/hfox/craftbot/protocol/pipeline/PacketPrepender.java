@@ -28,4 +28,8 @@ public class PacketPrepender extends MessageToByteEncoder<ByteBuf> {
         buffer.writeBytes(input);
     }
 
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        super.exceptionCaught(ctx, cause);
+    }
 }

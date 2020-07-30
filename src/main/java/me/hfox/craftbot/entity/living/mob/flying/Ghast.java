@@ -1,4 +1,4 @@
-package me.hfox.craftbot.entity.living.mob;
+package me.hfox.craftbot.entity.living.mob.flying;
 
 public interface Ghast extends Flying {
 

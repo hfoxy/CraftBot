@@ -22,6 +22,7 @@ import me.hfox.craftbot.protocol.pipeline.ProtocolHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Future;
@@ -36,6 +37,7 @@ public class BasicClient implements Client {
     public void connect(String host, int port) throws BotConnectionException {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
 
+        boolean safe = false;
         try {
             Bootstrap bootstrap = new Bootstrap();
             bootstrap.group(workerGroup);
@@ -47,18 +49,31 @@ public class BasicClient implements Client {
             LOGGER.info("client init");
 
             // Start the client.
-            ChannelFuture f = bootstrap.connect(host, port).sync();
+            ChannelFuture channel = bootstrap.connect(host, port).sync();
             LOGGER.info("client started");
 
             onConnect(host, port);
+            safe = true;
 
-            // Wait until the connection is closed.
-            f.channel().closeFuture().sync();
-            LOGGER.info("client stopped");
+            Thread th = new Thread(() -> {
+                try {
+                    // Wait until the connection is closed.
+                    channel.channel().closeFuture().sync();
+                    LOGGER.info("client stopped");
+                } catch (Exception ex) {
+                    LOGGER.error("Unable to stop safely");
+                } finally {
+                    workerGroup.shutdownGracefully();
+                }
+            });
+
+            th.start();
         } catch (Exception ex) {
             throw new BotConnectionException("Unable to connect", ex);
         } finally {
-            workerGroup.shutdownGracefully();
+            if (!safe) {
+                workerGroup.shutdownGracefully();
+            }
         }
     }
 

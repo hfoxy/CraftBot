@@ -112,4 +112,16 @@ public class Location {
         return loc;
     }
 
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Location{");
+        sb.append("x=").append(x);
+        sb.append(", y=").append(y);
+        sb.append(", z=").append(z);
+        sb.append(", yaw=").append(yaw);
+        sb.append(", pitch=").append(pitch);
+        sb.append('}');
+        return sb.toString();
+    }
+
 }

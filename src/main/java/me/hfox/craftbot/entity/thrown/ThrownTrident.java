@@ -20,8 +20,8 @@ public interface ThrownTrident extends Entity {
 
     void setLoyaltyLevel(byte loyaltyLevel);
 
-    boolean hasEnchantment();
+    boolean isEnchanted();
 
-    void setEnchantment(boolean enchantment);
+    void setEnchanted(boolean enchanted);
 
 }

@@ -80,12 +80,21 @@ public class PlayClient extends BasicClient {
                         if (addPlayer.getUuid().equals(uniqueId)) {
                             LOGGER.info("Received Bot Player Info, sending status and settings");
                             getConnection().writePacket(new PacketClientPlayClientStatus(ClientStatusAction.RESPAWN));
-                            getConnection().writePacket(new PacketClientPlayClientSettings("en_GB", 16, ChatMode.ENABLED, true, 0xFF, Hand.RIGHT));
+                            getConnection().writePacket(new PacketClientPlayClientSettings(
+                                    "en_GB", 16, ChatMode.ENABLED, true, 0xFF, Hand.RIGHT
+                            ));
                         }
                     } else {
                         info = playerInfo.get(addPlayer.getUuid());
                     }
                 } else if (action.getType() == PlayerInfoActionType.REMOVE_PLAYER) {
+                    String name = "unknown";
+                    info = playerInfo.get(action.getUuid());
+                    if (info != null) {
+                        name = info.getName();
+                    }
+
+                    LOGGER.info("Removing Player Info for '{}' - {}", name, action.getUuid());
                     playerInfo.remove(action.getUuid());
                     continue;
                 } else {

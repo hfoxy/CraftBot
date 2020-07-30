@@ -7,7 +7,7 @@ import me.hfox.craftbot.entity.living.Player;
 public class PlayerEntityType extends EntityType<Player, PlayerCreationData> {
 
     public PlayerEntityType(int typeId, String name, String identifier) {
-        super(CraftPlayer.class, typeId, name, identifier, PlayerCreationData.class);
+        super(CraftPlayer.class, typeId, name, identifier, PlayerCreationData.class, new CraftPlayer.Translator());
     }
 
     @Override

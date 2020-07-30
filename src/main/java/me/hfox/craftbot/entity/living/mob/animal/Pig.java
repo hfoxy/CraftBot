@@ -2,9 +2,9 @@ package me.hfox.craftbot.entity.living.mob.animal;
 
 public interface Pig extends Animal {
 
-    boolean hasSaddle();
+    boolean isSaddled();
 
-    void setSaddle(boolean saddle);
+    void setSaddled(boolean saddled);
 
     int getBoostTime();
 

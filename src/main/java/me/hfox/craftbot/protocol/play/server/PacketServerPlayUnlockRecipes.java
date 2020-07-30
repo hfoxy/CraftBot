@@ -11,11 +11,35 @@ public class PacketServerPlayUnlockRecipes implements ServerPacket {
     private boolean craftingRecipeBookFilterActive;
     private boolean smeltingRecipeBookOpen;
     private boolean smeltingRecipeBookFilterActive;
-    private int[] recipeIds;
-    private String[] recipeIdentifiers;
+    private String[] recipeIds;
+    private String[] initRecipeIds;
 
     public RecipeAction getAction() {
         return action;
+    }
+
+    public boolean isCraftingRecipeBookOpen() {
+        return craftingRecipeBookOpen;
+    }
+
+    public boolean isCraftingRecipeBookFilterActive() {
+        return craftingRecipeBookFilterActive;
+    }
+
+    public boolean isSmeltingRecipeBookOpen() {
+        return smeltingRecipeBookOpen;
+    }
+
+    public boolean isSmeltingRecipeBookFilterActive() {
+        return smeltingRecipeBookFilterActive;
+    }
+
+    public String[] getRecipeIds() {
+        return recipeIds;
+    }
+
+    public String[] getInitRecipeIds() {
+        return initRecipeIds;
     }
 
     @Override
@@ -26,15 +50,15 @@ public class PacketServerPlayUnlockRecipes implements ServerPacket {
         smeltingRecipeBookOpen = buffer.readBoolean();
         smeltingRecipeBookFilterActive = buffer.readBoolean();
 
-        recipeIds = new int[buffer.readVarInt()];
+        recipeIds = new String[buffer.readVarInt()];
         for (int i = 0; i < recipeIds.length; i++) {
-            recipeIds[i] = buffer.readVarInt();
+            recipeIds[i] = buffer.readString();
         }
 
         if (action == RecipeAction.INIT) {
-            recipeIdentifiers = new String[buffer.readVarInt()];
-            for (int i = 0; i < recipeIdentifiers.length; i++) {
-                recipeIdentifiers[i] = buffer.readString();
+            initRecipeIds = new String[buffer.readVarInt()];
+            for (int i = 0; i < initRecipeIds.length; i++) {
+                initRecipeIds[i] = buffer.readString();
             }
         }
     }

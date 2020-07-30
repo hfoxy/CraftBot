@@ -61,7 +61,7 @@ public class PlayerInfo {
     }
 
     public Optional<ChatComponent> getDisplayName() {
-        return Optional.of(displayName);
+        return Optional.ofNullable(displayName);
     }
 
     public void setDisplayName(ChatComponent displayName) {

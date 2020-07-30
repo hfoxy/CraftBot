@@ -71,12 +71,7 @@ public class ClientHandler {
     }
 
     public void onReceive(ServerPacket packet) {
-        if (packet instanceof PacketServerPlaySpawnPlayer
-                || packet instanceof PacketServerPlaySpawnEntity
-                || packet instanceof PacketServerPlaySpawnLivingEntity
-                || packet instanceof PacketServerPlayPlayerInfo) {
-            worldHandler.onReceive(packet);
-        }
+        worldHandler.onReceive(packet);
     }
 
 }

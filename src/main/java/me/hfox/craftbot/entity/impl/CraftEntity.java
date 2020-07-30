@@ -1,5 +1,6 @@
 package me.hfox.craftbot.entity.impl;
 
+import me.hfox.craftbot.chat.ChatColour;
 import me.hfox.craftbot.chat.ChatComponent;
 import me.hfox.craftbot.entity.BoundingBox;
 import me.hfox.craftbot.entity.Entity;
@@ -236,6 +237,12 @@ public class CraftEntity implements Entity {
         this.velocity = velocity;
     }
 
+    @Override
+    public String getBriefInfo() {
+        return getClass().getSimpleName() + "[customName='"
+                + getCustomName() + ChatColour.RESET + "',location=" + location + "]";
+    }
+
     public static class Translator extends EntityIndexTranslatorBase<Entity> {
 
         public Translator() {
@@ -260,7 +267,7 @@ public class CraftEntity implements Entity {
             } else if (index == 1) {
                 entity.setAir(buffer.readVarInt());
             } else if (index == 2) {
-                entity.setCustomName(buffer.readChat());
+                entity.setCustomName(buffer.readChatOptional().orElse(null));
             } else if (index == 3) {
                 entity.setCustomNameVisible(buffer.readBoolean());
             } else if (index == 4) {

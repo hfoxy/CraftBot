@@ -16,7 +16,7 @@ public abstract class EntityIndexTranslatorBase<E extends Entity> implements Ent
     }
 
     @Override
-    @SuppressWarnings("unchecked")// it is checked
+    @SuppressWarnings("unchecked") // it is checked
     public void checkAndRead(Entity entity, EntityMetadata metadata) throws IOException {
         Preconditions.checkNotNull(entity, "entity cannot be null");
         Preconditions.checkNotNull(metadata, "buffer cannot be null");
