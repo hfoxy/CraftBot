@@ -86,6 +86,12 @@ public class ServerConnection implements Connection {
     public void handle(ServerPacket packet) {
         LOGGER.debug("Received {}", packet.getClass().getSimpleName());
 
+        try {
+            client.onReceive(packet);
+        } catch (Throwable ex) {
+            LOGGER.error("Unable to pass Packet to client", ex);
+        }
+
         if (packet instanceof PacketServerStatusResponse) {
             ServerListPingResponse response = ((PacketServerStatusResponse) packet).getResponse();
             LOGGER.info("Protocol '{}' v{}", response.getVersion().getName(), response.getVersion().getProtocol());
@@ -107,6 +113,7 @@ public class ServerConnection implements Connection {
         } else if (packet instanceof PacketServerLoginSuccess) {
             LOGGER.info("Login success!");
             protocol.setState(ProtocolState.PLAY);
+            client.completeLogin();
         } else if (packet instanceof PacketServerLoginSetCompression) {
             int threshold = ((PacketServerLoginSetCompression) packet).getThreshold();
             getCompression().enable(threshold);
@@ -152,35 +159,10 @@ public class ServerConnection implements Connection {
             LOGGER.info("Held item: {}", heldItemChange.getSlot());
         } else if (packet instanceof PacketServerPlayPlayerPositionAndLook) {
             PacketServerPlayPlayerPositionAndLook positionAndLook = (PacketServerPlayPlayerPositionAndLook) packet;
-
-            double x = positionAndLook.getX();
-            if (positionAndLook.isxRelative()) {
-                x = client.getClientPlayer().getLocation().getX() + positionAndLook.getX();
-            }
-
-            double y = positionAndLook.getY();
-            if (positionAndLook.isxRelative()) {
-                y = client.getClientPlayer().getLocation().getY() + positionAndLook.getY();
-            }
-
-            double z = positionAndLook.getZ();
-            if (positionAndLook.isxRelative()) {
-                z = client.getClientPlayer().getLocation().getZ() + positionAndLook.getZ();
-            }
-
-            client.getClientPlayer().setLocation(new Location(x, y, z, positionAndLook.getYaw(), positionAndLook.getPitch()));
             writePacket(new PacketClientPlayTeleportConfirm(positionAndLook.getTeleportId()));
         } else if (packet instanceof PacketServerPlayDisconnect) {
             PacketServerPlayDisconnect disconnect = (PacketServerPlayDisconnect) packet;
             LOGGER.info("Disconnected by server: {}", disconnect.getReason());
-        } else if (packet instanceof PacketServerPlayPlayerInfo) {
-            PacketServerPlayPlayerInfo playerInfo = (PacketServerPlayPlayerInfo) packet;
-            writePacket(new PacketClientPlayClientStatus(ClientStatusAction.RESPAWN));
-            writePacket(new PacketClientPlayClientSettings("en_GB", 16, ChatMode.ENABLED, true, 0xFF, Hand.RIGHT));
-
-            if (client != null) {
-                client.completeLogin();
-            }
         } else if (packet instanceof PacketServerPlayChangeGameState) {
             LOGGER.info("Told to change game state: {}", packet);
         }
@@ -191,6 +173,8 @@ public class ServerConnection implements Connection {
         if (packet instanceof PacketClientHandshake) {
             protocol.setState(((PacketClientHandshake) packet).getNextState());
         }
+
+        client.onSend(packet);
     }
 
 }

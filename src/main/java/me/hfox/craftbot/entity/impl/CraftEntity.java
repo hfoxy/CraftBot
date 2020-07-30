@@ -8,6 +8,9 @@ import me.hfox.craftbot.entity.data.Pose;
 import me.hfox.craftbot.entity.translator.EntityIndexTranslatorBase;
 import me.hfox.craftbot.protocol.play.server.data.entity.EntityMetadata;
 import me.hfox.craftbot.protocol.stream.ProtocolBuffer;
+import me.hfox.craftbot.world.Location;
+import me.hfox.craftbot.world.Velocity;
+import me.hfox.craftbot.world.World;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -17,29 +20,40 @@ import static me.hfox.craftbot.utils.BitUtils.hasFlag;
 
 public class CraftEntity implements Entity {
 
+    private final World world;
+
     private final int id;
     private final UUID uuid;
     private final EntityType entityType;
 
-    private boolean onFire;
-    private boolean crouched;
-    private boolean riding;
-    private boolean sprinting;
-    private boolean swimming;
-    private boolean invisible;
-    private boolean glowing;
-    private boolean elytraFlying;
-    private int air;
+    private boolean onFire = false;
+    private boolean crouched = false;
+    private boolean riding = false;
+    private boolean sprinting = false;
+    private boolean swimming = false;
+    private boolean invisible = false;
+    private boolean glowing = false;
+    private boolean elytraFlying = false;
+    private int air = 300;
     private ChatComponent customName;
-    private boolean customNameVisible;
-    private boolean silent;
-    private boolean gravity;
-    private Pose pose;
+    private boolean customNameVisible = false;
+    private boolean silent = false;
+    private boolean gravity = true;
+    private Pose pose = Pose.STANDING;
 
-    public CraftEntity(int id, UUID uuid, EntityType entityType) {
+    private Location location;
+    private Velocity velocity;
+
+    public CraftEntity(World world, int id, UUID uuid, EntityType<? extends Entity, ?> entityType) {
+        this.world = world;
         this.id = id;
         this.uuid = uuid;
         this.entityType = entityType;
+    }
+
+    @Override
+    public World getWorld() {
+        return world;
     }
 
     @Override
@@ -200,6 +214,26 @@ public class CraftEntity implements Entity {
     @Override
     public void setPose(Pose pose) {
         this.pose = pose;
+    }
+
+    @Override
+    public Location getLocation() {
+        return location;
+    }
+
+    @Override
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    @Override
+    public Velocity getVelocity() {
+        return velocity;
+    }
+
+    @Override
+    public void setVelocity(Velocity velocity) {
+        this.velocity = velocity;
     }
 
     public static class Translator extends EntityIndexTranslatorBase<Entity> {

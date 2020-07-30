@@ -6,4 +6,8 @@ public class BotUnsupportedEntityException extends RuntimeException {
         super(message);
     }
 
+    public BotUnsupportedEntityException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
 }

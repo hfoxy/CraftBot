@@ -18,7 +18,7 @@ public interface LivingEntity extends Entity {
 
     boolean isInRiptideSpinAttack();
 
-    void setIsInRiptideSpinAttack(boolean inRiptideSpinAttack);
+    void setInRiptideSpinAttack(boolean inRiptideSpinAttack);
 
     float getHealth();
 

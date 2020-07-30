@@ -13,6 +13,10 @@ public class Location {
     private int blockY;
     private int blockZ;
 
+    private Location() {
+        // for cloning purposes
+    }
+
     public Location(int blockX, int blockY, int blockZ) {
         this.blockX = blockX;
         this.blockY = blockY;
@@ -93,6 +97,19 @@ public class Location {
 
     public void setBlockZ(int blockZ) {
         this.blockZ = blockZ;
+    }
+
+    public Location copy() {
+        Location loc = new Location();
+        loc.x = x;
+        loc.blockX = blockX;
+        loc.y = y;
+        loc.blockY = blockY;
+        loc.z = z;
+        loc.blockZ = blockZ;
+        loc.yaw = yaw;
+        loc.pitch = pitch;
+        return loc;
     }
 
 }

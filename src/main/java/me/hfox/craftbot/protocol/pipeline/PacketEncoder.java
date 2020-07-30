@@ -24,7 +24,6 @@ public class PacketEncoder extends MessageToByteEncoder<ClientPacket> {
         ProtocolBuffer buffer = new ProtocolBuffer(byteBuf);
 
         try {
-            LOGGER.info("Writing Packet {}", clientPacket);
             connection.getProtocol().write(connection, buffer, clientPacket);
         } catch (Exception ex) {
             LOGGER.error("Error writing Packet", ex);

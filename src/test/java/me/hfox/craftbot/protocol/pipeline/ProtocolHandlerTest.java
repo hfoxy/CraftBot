@@ -20,7 +20,7 @@ class ProtocolHandlerTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProtocolHandlerTest.class);
 
-    @Test
+    // @Test
     void writeRead() throws Exception {
         ServerConnection connection = new ServerConnection(null, null, new JavaProtocol());
         connection.getCompression().enable(256);

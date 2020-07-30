@@ -2,11 +2,16 @@ package me.hfox.craftbot.entity;
 
 import me.hfox.craftbot.chat.ChatComponent;
 import me.hfox.craftbot.entity.data.Pose;
+import me.hfox.craftbot.world.Location;
+import me.hfox.craftbot.world.Velocity;
+import me.hfox.craftbot.world.World;
 
 import java.util.Optional;
 import java.util.UUID;
 
 public interface Entity {
+
+    World getWorld();
 
     int getId();
 
@@ -72,5 +77,13 @@ public interface Entity {
     Pose getPose();
 
     void setPose(Pose pose);
+
+    Location getLocation();
+
+    void setLocation(Location location);
+
+    Velocity getVelocity();
+
+    void setVelocity(Velocity velocity);
 
 }
