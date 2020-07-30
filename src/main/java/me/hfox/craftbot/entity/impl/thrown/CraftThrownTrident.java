@@ -4,7 +4,6 @@ import me.hfox.craftbot.entity.Entity;
 import me.hfox.craftbot.entity.EntityType;
 import me.hfox.craftbot.entity.impl.CraftEntity;
 import me.hfox.craftbot.entity.thrown.ThrownTrident;
-import me.hfox.craftbot.entity.translator.HierarchyEntityIndexTranslatorBase;
 import me.hfox.craftbot.protocol.play.server.data.entity.EntityMetadata;
 import me.hfox.craftbot.protocol.stream.ProtocolBuffer;
 import me.hfox.craftbot.world.World;
@@ -76,30 +75,24 @@ public class CraftThrownTrident extends CraftEntity implements ThrownTrident {
         this.enchanted = enchanted;
     }
 
-    public static class Translator extends HierarchyEntityIndexTranslatorBase<ThrownTrident> {
+    @Override
+    public void readMetadata(EntityMetadata metadata) throws IOException {
+        super.readMetadata(metadata);
 
-        public Translator() {
-            super(ThrownTrident.class, new CraftEntity.Translator());
+        int index = metadata.getIndex();
+        ProtocolBuffer buffer = metadata.getBufferValue();
+
+        if (index == 7) {
+            byte flags = buffer.readByte();
+            setCritical(hasFlag(flags, 0x01));
+            setNoClip(hasFlag(flags, 0x02));
+        } else if (index == 8) {
+            setPiercingLevel(buffer.readByte());
+        } else if (index == 9) {
+            setLoyaltyLevel(buffer.readByte());
+        } else if (index == 10) {
+            setEnchanted(buffer.readBoolean());
         }
-
-        @Override
-        public void read(ThrownTrident entity, EntityMetadata metadata) throws IOException {
-            int index = metadata.getIndex();
-            ProtocolBuffer buffer = metadata.getBufferValue();
-
-            if (index == 7) {
-                byte flags = buffer.readByte();
-                entity.setCritical(hasFlag(flags, 0x01));
-                entity.setNoClip(hasFlag(flags, 0x02));
-            } else if (index == 8) {
-                entity.setPiercingLevel(buffer.readByte());
-            } else if (index == 9) {
-                entity.setLoyaltyLevel(buffer.readByte());
-            } else if (index == 10) {
-                entity.setEnchanted(buffer.readBoolean());
-            }
-        }
-
     }
 
 }

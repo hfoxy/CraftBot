@@ -1,13 +1,9 @@
 package me.hfox.craftbot.entity.impl.living;
 
-import me.hfox.craftbot.entity.Entity;
 import me.hfox.craftbot.entity.EntityType;
 import me.hfox.craftbot.entity.data.ActiveHand;
-import me.hfox.craftbot.entity.data.Pose;
 import me.hfox.craftbot.entity.impl.CraftEntity;
 import me.hfox.craftbot.entity.living.LivingEntity;
-import me.hfox.craftbot.entity.translator.EntityIndexTranslatorBase;
-import me.hfox.craftbot.entity.translator.HierarchyEntityIndexTranslatorBase;
 import me.hfox.craftbot.protocol.play.server.data.entity.EntityMetadata;
 import me.hfox.craftbot.protocol.stream.ProtocolBuffer;
 import me.hfox.craftbot.world.Location;
@@ -130,37 +126,31 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
         this.bedLocation = bedLocation;
     }
 
-    public static class Translator extends HierarchyEntityIndexTranslatorBase<LivingEntity> {
+    @Override
+    public void readMetadata(EntityMetadata metadata) throws IOException {
+        super.readMetadata(metadata);
 
-        public Translator() {
-            super(LivingEntity.class, new CraftEntity.Translator());
+        int index = metadata.getIndex();
+        ProtocolBuffer buffer = metadata.getBufferValue();
+
+        if (index == 7) {
+            byte flags = buffer.readByte();
+            setHandActive(hasFlag(flags, 0x01));
+            setActiveHand(hasFlag(flags, 0x02) ? ActiveHand.MAIN_HAND : ActiveHand.OFFHAND);
+            setInRiptideSpinAttack(hasFlag(flags, 0x04));
+        } else if (index == 8) {
+            setHealth(buffer.readFloat());
+        } else if (index == 9) {
+            setPotionEffectColour(buffer.readVarInt());
+        } else if (index == 10) {
+            setPotionEffectAmbient(buffer.readBoolean());
+        } else if (index == 11) {
+            setStuckArrowCount(buffer.readVarInt());
+        } else if (index == 12) {
+            setAbsorptionHealth(buffer.readVarInt());
+        } else if (index == 13) {
+            setBedLocation(buffer.readPositionOptional().orElse(null));
         }
-
-        @Override
-        public void read(LivingEntity entity, EntityMetadata metadata) throws IOException {
-            int index = metadata.getIndex();
-            ProtocolBuffer buffer = metadata.getBufferValue();
-
-            if (index == 7) {
-                byte flags = buffer.readByte();
-                entity.setHandActive(hasFlag(flags, 0x01));
-                entity.setActiveHand(hasFlag(flags, 0x02) ? ActiveHand.MAIN_HAND : ActiveHand.OFFHAND);
-                entity.setInRiptideSpinAttack(hasFlag(flags, 0x04));
-            } else if (index == 8) {
-                entity.setHealth(buffer.readFloat());
-            } else if (index == 9) {
-                entity.setPotionEffectColour(buffer.readVarInt());
-            } else if (index == 10) {
-                entity.setPotionEffectAmbient(buffer.readBoolean());
-            } else if (index == 11) {
-                entity.setStuckArrowCount(buffer.readVarInt());
-            } else if (index == 12) {
-                entity.setAbsorptionHealth(buffer.readVarInt());
-            } else if (index == 13) {
-                entity.setBedLocation(buffer.readPositionOptional().orElse(null));
-            }
-        }
-
     }
 
 }

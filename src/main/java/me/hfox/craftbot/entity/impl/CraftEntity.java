@@ -6,7 +6,6 @@ import me.hfox.craftbot.entity.BoundingBox;
 import me.hfox.craftbot.entity.Entity;
 import me.hfox.craftbot.entity.EntityType;
 import me.hfox.craftbot.entity.data.Pose;
-import me.hfox.craftbot.entity.translator.EntityIndexTranslatorBase;
 import me.hfox.craftbot.protocol.play.server.data.entity.EntityMetadata;
 import me.hfox.craftbot.protocol.stream.ProtocolBuffer;
 import me.hfox.craftbot.world.Location;
@@ -243,42 +242,34 @@ public class CraftEntity implements Entity {
                 + getCustomName() + ChatColour.RESET + "',location=" + location + "]";
     }
 
-    public static class Translator extends EntityIndexTranslatorBase<Entity> {
+    @Override
+    public void readMetadata(EntityMetadata metadata) throws IOException {
+        int index = metadata.getIndex();
+        ProtocolBuffer buffer = metadata.getBufferValue();
 
-        public Translator() {
-            super(Entity.class);
+        if (index == 0) {
+            byte flags = buffer.readByte();
+            setOnFire(hasFlag(flags, 0x01));
+            setCrouched(hasFlag(flags, 0x02));
+            setRiding(hasFlag(flags, 0x04));
+            setSprinting(hasFlag(flags, 0x08));
+            setSwimming(hasFlag(flags, 0x10));
+            setInvisible(hasFlag(flags, 0x20));
+            setGlowing(hasFlag(flags, 0x40));
+            setElytraFlying(hasFlag(flags, 0x80));
+        } else if (index == 1) {
+            setAir(buffer.readVarInt());
+        } else if (index == 2) {
+            setCustomName(buffer.readChatOptional().orElse(null));
+        } else if (index == 3) {
+            setCustomNameVisible(buffer.readBoolean());
+        } else if (index == 4) {
+            setSilent(buffer.readBoolean());
+        } else if (index == 5) {
+            setGravity(!buffer.readBoolean());
+        } else if (index == 6) {
+            setPose(Pose.values()[buffer.readVarInt()]);
         }
-
-        @Override
-        public void read(Entity entity, EntityMetadata metadata) throws IOException {
-            int index = metadata.getIndex();
-            ProtocolBuffer buffer = metadata.getBufferValue();
-
-            if (index == 0) {
-                byte flags = buffer.readByte();
-                entity.setOnFire(hasFlag(flags, 0x01));
-                entity.setCrouched(hasFlag(flags, 0x02));
-                entity.setRiding(hasFlag(flags, 0x04));
-                entity.setSprinting(hasFlag(flags, 0x08));
-                entity.setSwimming(hasFlag(flags, 0x10));
-                entity.setInvisible(hasFlag(flags, 0x20));
-                entity.setGlowing(hasFlag(flags, 0x40));
-                entity.setElytraFlying(hasFlag(flags, 0x80));
-            } else if (index == 1) {
-                entity.setAir(buffer.readVarInt());
-            } else if (index == 2) {
-                entity.setCustomName(buffer.readChatOptional().orElse(null));
-            } else if (index == 3) {
-                entity.setCustomNameVisible(buffer.readBoolean());
-            } else if (index == 4) {
-                entity.setSilent(buffer.readBoolean());
-            } else if (index == 5) {
-                entity.setGravity(!buffer.readBoolean());
-            } else if (index == 6) {
-                entity.setPose(Pose.values()[buffer.readVarInt()]);
-            }
-        }
-
     }
 
 }

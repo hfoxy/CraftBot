@@ -1,10 +1,8 @@
 package me.hfox.craftbot.entity.impl.living.mob.monster;
 
 import me.hfox.craftbot.entity.EntityType;
-import me.hfox.craftbot.entity.impl.living.CraftLivingEntity;
 import me.hfox.craftbot.entity.living.LivingEntity;
 import me.hfox.craftbot.entity.living.mob.monster.Creeper;
-import me.hfox.craftbot.entity.translator.HierarchyEntityIndexTranslatorBase;
 import me.hfox.craftbot.protocol.play.server.data.entity.EntityMetadata;
 import me.hfox.craftbot.protocol.stream.ProtocolBuffer;
 import me.hfox.craftbot.world.World;
@@ -52,26 +50,20 @@ public class CraftCreeper extends CraftMonster implements Creeper {
         this.ignited = ignited;
     }
 
-    public static class Translator extends HierarchyEntityIndexTranslatorBase<Creeper> {
+    @Override
+    public void readMetadata(EntityMetadata metadata) throws IOException {
+        super.readMetadata(metadata);
 
-        public Translator() {
-            super(Creeper.class, new CraftLivingEntity.Translator());
+        int index = metadata.getIndex();
+        ProtocolBuffer buffer = metadata.getBufferValue();
+
+        if (index == 15) {
+            setFused(buffer.readVarInt() == 1);
+        } else if (index == 16) {
+            setCharged(buffer.readBoolean());
+        } else if (index == 17) {
+            setIgnited(buffer.readBoolean());
         }
-
-        @Override
-        public void read(Creeper entity, EntityMetadata metadata) throws IOException {
-            int index = metadata.getIndex();
-            ProtocolBuffer buffer = metadata.getBufferValue();
-
-            if (index == 15) {
-                entity.setFused(buffer.readVarInt() == 1);
-            } else if (index == 16) {
-                entity.setCharged(buffer.readBoolean());
-            } else if (index == 17) {
-                entity.setIgnited(buffer.readBoolean());
-            }
-        }
-
     }
 
 }

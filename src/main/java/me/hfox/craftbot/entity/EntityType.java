@@ -2,10 +2,6 @@ package me.hfox.craftbot.entity;
 
 import com.google.common.base.Preconditions;
 import me.hfox.craftbot.entity.data.creation.EntityCreationData;
-import me.hfox.craftbot.entity.data.creation.PlayerCreationData;
-import me.hfox.craftbot.entity.data.creation.PlayerEntityType;
-import me.hfox.craftbot.entity.living.Player;
-import me.hfox.craftbot.entity.translator.EntityIndexTranslator;
 import me.hfox.craftbot.exception.entity.BotUnsupportedEntityException;
 import me.hfox.craftbot.world.World;
 
@@ -19,12 +15,10 @@ public class EntityType<E extends Entity, D extends EntityCreationData> {
 
     private final Class<? extends E> type;
     private final int typeId;
-    private final String name;
     private final String identifier;
     private final Class<? extends D> dataType;
-    private final EntityIndexTranslator<?> translator;
 
-    public EntityType(Class<? extends E> type, int typeId, String name, String identifier, Class<? extends D> dataType, EntityIndexTranslator<?> translator) {
+    public EntityType(Class<? extends E> type, int typeId, String identifier, Class<? extends D> dataType) {
         if (REGISTERED_ENTITIES.containsKey(typeId)) {
             throw new BotUnsupportedEntityException("Entity already registered with ID #" + typeId);
         }
@@ -38,10 +32,8 @@ public class EntityType<E extends Entity, D extends EntityCreationData> {
 
         this.type = type;
         this.typeId = typeId;
-        this.name = name;
         this.identifier = identifier;
         this.dataType = dataType;
-        this.translator = translator;
     }
 
     public Class<? extends E> getType() {
@@ -52,16 +44,8 @@ public class EntityType<E extends Entity, D extends EntityCreationData> {
         return typeId;
     }
 
-    public String getName() {
-        return name;
-    }
-
     public String getIdentifier() {
         return identifier;
-    }
-
-    public EntityIndexTranslator<?> getTranslator() {
-        return translator;
     }
 
     @SuppressWarnings("unchecked")

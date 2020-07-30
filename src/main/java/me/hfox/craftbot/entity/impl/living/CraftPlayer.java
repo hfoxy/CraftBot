@@ -3,14 +3,10 @@ package me.hfox.craftbot.entity.impl.living;
 import me.hfox.craftbot.chat.ChatColour;
 import me.hfox.craftbot.chat.ChatComponent;
 import me.hfox.craftbot.entity.EntityType;
-import me.hfox.craftbot.entity.data.ActiveHand;
 import me.hfox.craftbot.entity.data.DisplayedSkinParts;
 import me.hfox.craftbot.entity.data.Hand;
 import me.hfox.craftbot.entity.data.PlayerInfo;
-import me.hfox.craftbot.entity.living.LivingEntity;
 import me.hfox.craftbot.entity.living.Player;
-import me.hfox.craftbot.entity.translator.EntityIndexTranslatorBase;
-import me.hfox.craftbot.entity.translator.HierarchyEntityIndexTranslatorBase;
 import me.hfox.craftbot.nbt.Tag;
 import me.hfox.craftbot.player.Gamemode;
 import me.hfox.craftbot.protocol.play.server.data.entity.EntityMetadata;
@@ -153,6 +149,42 @@ public class CraftPlayer extends CraftLivingEntity implements Player {
     }
 
     @Override
+    public void readMetadata(EntityMetadata metadata) throws IOException {
+        super.readMetadata(metadata);
+
+        int index = metadata.getIndex();
+        ProtocolBuffer buffer = metadata.getBufferValue();
+
+        if (index == 14) {
+            setAdditionalHearts(buffer.readFloat());
+        } else if (index == 15) {
+            setScore(buffer.readVarInt());
+        } else if (index == 16) {
+            byte flags = buffer.readByte();
+
+            boolean cape = hasFlag(flags, 0x01);
+            boolean jacket = hasFlag(flags, 0x02);
+            boolean leftSleeve = hasFlag(flags, 0x04);
+            boolean rightSleeve = hasFlag(flags, 0x08);
+            boolean leftTrouser = hasFlag(flags, 0x10);
+            boolean rightTrouser = hasFlag(flags, 0x20);
+            boolean hat = hasFlag(flags, 0x40);
+
+            DisplayedSkinParts skinParts = new DisplayedSkinParts(
+                    cape, jacket, leftSleeve, rightSleeve, leftTrouser, rightTrouser, hat
+            );
+
+            setSkinParts(skinParts);
+        } else if (index == 17) {
+            setMainHand(buffer.readVarInt() == 0 ? Hand.LEFT : Hand.RIGHT);
+        } else if (index == 18) {
+            setLeftShoulderEntity(buffer.readTag());
+        } else if (index == 19) {
+            setRightShoulderEntity(buffer.readTag());
+        }
+    }
+
+    @Override
     public String getBriefInfo() {
         return getClass().getSimpleName() + "[name='" + getName() + "',customName='"
                 + getCustomName() + ChatColour.RESET + "',location=" + getLocation() + "]";
@@ -161,48 +193,6 @@ public class CraftPlayer extends CraftLivingEntity implements Player {
     @Override
     public String toString() {
         return ToStringBuilder.build(this).deepArray(true).parents(true).reflective(true).simpleName(true).toString();
-    }
-
-    public static class Translator extends HierarchyEntityIndexTranslatorBase<Player> {
-
-        public Translator() {
-            super(Player.class, new CraftLivingEntity.Translator());
-        }
-
-        @Override
-        public void read(Player entity, EntityMetadata metadata) throws IOException {
-            int index = metadata.getIndex();
-            ProtocolBuffer buffer = metadata.getBufferValue();
-
-            if (index == 14) {
-                entity.setAdditionalHearts(buffer.readFloat());
-            } else if (index == 15) {
-                entity.setScore(buffer.readVarInt());
-            } else if (index == 16) {
-                byte flags = buffer.readByte();
-
-                boolean cape = hasFlag(flags, 0x01);
-                boolean jacket = hasFlag(flags, 0x02);
-                boolean leftSleeve = hasFlag(flags, 0x04);
-                boolean rightSleeve = hasFlag(flags, 0x08);
-                boolean leftTrouser = hasFlag(flags, 0x10);
-                boolean rightTrouser = hasFlag(flags, 0x20);
-                boolean hat = hasFlag(flags, 0x40);
-
-                DisplayedSkinParts skinParts = new DisplayedSkinParts(
-                        cape, jacket, leftSleeve, rightSleeve, leftTrouser, rightTrouser, hat
-                );
-
-                entity.setSkinParts(skinParts);
-            } else if (index == 17) {
-                entity.setMainHand(buffer.readVarInt() == 0 ? Hand.LEFT : Hand.RIGHT);
-            } else if (index == 18) {
-                entity.setLeftShoulderEntity(buffer.readTag());
-            } else if (index == 19) {
-                entity.setRightShoulderEntity(buffer.readTag());
-            }
-        }
-
     }
 
 }

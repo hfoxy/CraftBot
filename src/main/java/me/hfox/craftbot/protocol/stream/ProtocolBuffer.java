@@ -10,6 +10,7 @@ import me.hfox.craftbot.entity.data.VillagerProfession;
 import me.hfox.craftbot.entity.data.VillagerType;
 import me.hfox.craftbot.entity.particle.Particle;
 import me.hfox.craftbot.exception.nbt.BotUnknownTagTypeException;
+import me.hfox.craftbot.exception.world.BotUnknownBlockException;
 import me.hfox.craftbot.nbt.*;
 import me.hfox.craftbot.protocol.play.server.data.SlotData;
 import me.hfox.craftbot.protocol.play.server.data.player.PlayerInfoProperty;
@@ -17,6 +18,8 @@ import me.hfox.craftbot.protocol.play.server.data.recipe.IngredientData;
 import me.hfox.craftbot.world.Direction;
 import me.hfox.craftbot.world.Location;
 import me.hfox.craftbot.world.Rotation;
+import me.hfox.craftbot.world.palette.BlockPalette;
+import me.hfox.craftbot.world.palette.BlockStateDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -345,19 +348,6 @@ public class ProtocolBuffer extends NestedBuffer {
         writeByte(b);
     }
 
-    public int readBlockId() {
-        return readVarInt();
-    }
-
-    public Optional<Integer> readBlockIdOptional() {
-        int value = readVarInt();
-        if (value == 0) {
-            return Optional.empty();
-        }
-
-        return Optional.of(value);
-    }
-
     public Rotation readRotation() {
         return new Rotation(readFloat(), readFloat(), readFloat());
     }
@@ -415,6 +405,24 @@ public class ProtocolBuffer extends NestedBuffer {
         byte[] data = new byte[readVarInt()];
         readBytes(data);
         return data;
+    }
+
+    public BlockStateDto readBlockState() {
+        int blockId = readVarInt();
+        return BlockPalette.findById(blockId).orElseThrow(() -> new BotUnknownBlockException(Integer.toString(blockId)));
+    }
+
+    private BlockStateDto readBlockStateFromId(int blockId) {
+        return BlockPalette.findById(blockId).orElseThrow(() -> new BotUnknownBlockException(Integer.toString(blockId)));
+    }
+
+    public Optional<BlockStateDto> readBlockStateOptional() {
+        int value = readVarInt();
+        if (value == 0) {
+            return Optional.empty();
+        }
+
+        return Optional.of(readBlockStateFromId(value));
     }
 
 }

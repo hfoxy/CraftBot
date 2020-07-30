@@ -53,23 +53,23 @@ public class WorldHandler {
             player.setLocation(location);
 
             world.addEntity(player);
-            LOGGER.info("Added Player entity for '{}' - {}", info.getName(), info.getUuid());
+            LOGGER.debug("Added Player entity for '{}' - {}", info.getName(), info.getUuid());
 
             clientHandler.getClient().getConnection().writePacket(new PacketClientPlayChatMessage("Hello " + player.getName()));
         } else if (packet instanceof PacketServerPlaySpawnEntity) {
             PacketServerPlaySpawnEntity spawn = (PacketServerPlaySpawnEntity) packet;
             EntityCreationData ecd = new EntityCreationData(world, spawn.getId(), spawn.getUuid());
-            LOGGER.info("Request spawn of {} ({} - {})", spawn.getType(), spawn.getId(), spawn.getUuid());
+            LOGGER.debug("Request spawn of {} ({} - {})", spawn.getType(), spawn.getId(), spawn.getUuid());
 
             Entity entity = EntityRegistration.createEntity(spawn.getType(), ecd);
             Location location = new Location(spawn.getX(), spawn.getY(), spawn.getZ(), spawn.getYaw(), spawn.getPitch());
             entity.setLocation(location);
 
             world.addEntity(entity);
-            LOGGER.info("Added {} entity", entity.getClass().getSimpleName());
+            LOGGER.debug("Added {} entity", entity.getClass().getSimpleName());
         } else if (packet instanceof PacketServerPlayDestroyEntities) {
             List<Entity> removed = world.removeEntitiesById(((PacketServerPlayDestroyEntities) packet).getEntityIds());
-            LOGGER.info("Removed {} entities", removed);
+            LOGGER.debug("Removed {} entities", removed);
 
             for (Entity rem : removed) {
                 if (rem instanceof Player) {
@@ -83,7 +83,7 @@ public class WorldHandler {
             world.findEntityById(entityMetadata.getEntityId()).ifPresent((entity) -> {
                 for (EntityMetadata metadata : entityMetadata.getMetadata()) {
                     try {
-                        entity.getEntityType().getTranslator().checkAndRead(entity, metadata);
+                        entity.readMetadata(metadata);
                     } catch (IOException ex) {
                         throw new BotUnsupportedEntityException("Unable to read metadata", ex);
                     }

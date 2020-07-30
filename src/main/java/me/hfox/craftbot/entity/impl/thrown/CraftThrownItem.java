@@ -1,27 +1,29 @@
-package me.hfox.craftbot.entity.impl;
+package me.hfox.craftbot.entity.impl.thrown;
 
 import me.hfox.craftbot.entity.Entity;
 import me.hfox.craftbot.entity.EntityType;
-import me.hfox.craftbot.entity.ItemEntity;
+import me.hfox.craftbot.entity.impl.CraftEntity;
+import me.hfox.craftbot.entity.thrown.ThrownItem;
 import me.hfox.craftbot.protocol.play.server.data.SlotData;
 import me.hfox.craftbot.protocol.play.server.data.entity.EntityMetadata;
 import me.hfox.craftbot.protocol.stream.ProtocolBuffer;
 import me.hfox.craftbot.world.World;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.UUID;
 
-public class CraftItemEntity extends CraftEntity implements ItemEntity {
+public class CraftThrownItem extends CraftEntity implements ThrownItem {
 
     private SlotData item;
 
-    public CraftItemEntity(World world, int id, UUID uuid, EntityType<? extends Entity, ?> entityType) {
+    public CraftThrownItem(World world, int id, UUID uuid, EntityType<? extends Entity, ?> entityType) {
         super(world, id, uuid, entityType);
     }
 
     @Override
-    public SlotData getItem() {
-        return item;
+    public Optional<SlotData> getItem() {
+        return Optional.ofNullable(item);
     }
 
     @Override

@@ -99,7 +99,7 @@ public enum EntityMetadataType {
     BLOCK_ID_OPTIONAL(13) {
         @Override
         public Optional<Integer> read(ProtocolBuffer buffer) {
-            return buffer.readBlockIdOptional();
+            return buffer.readBlockStateOptional();
         }
     },
     NBT(14) {

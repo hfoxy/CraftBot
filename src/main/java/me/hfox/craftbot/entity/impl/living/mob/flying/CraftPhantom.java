@@ -4,7 +4,6 @@ import me.hfox.craftbot.entity.EntityType;
 import me.hfox.craftbot.entity.impl.CraftEntity;
 import me.hfox.craftbot.entity.living.LivingEntity;
 import me.hfox.craftbot.entity.living.mob.flying.Phantom;
-import me.hfox.craftbot.entity.translator.HierarchyEntityIndexTranslatorBase;
 import me.hfox.craftbot.protocol.play.server.data.entity.EntityMetadata;
 import me.hfox.craftbot.protocol.stream.ProtocolBuffer;
 import me.hfox.craftbot.world.World;
@@ -30,22 +29,16 @@ public class CraftPhantom extends CraftFlying implements Phantom {
         this.size = size;
     }
 
-    public static class Translator extends HierarchyEntityIndexTranslatorBase<Phantom> {
+    @Override
+    public void readMetadata(EntityMetadata metadata) throws IOException {
+        super.readMetadata(metadata);
 
-        public Translator() {
-            super(Phantom.class, new CraftEntity.Translator());
+        int index = metadata.getIndex();
+        ProtocolBuffer buffer = metadata.getBufferValue();
+
+        if (index == 15) {
+            setSize(buffer.readVarInt());
         }
-
-        @Override
-        public void read(Phantom entity, EntityMetadata metadata) throws IOException {
-            int index = metadata.getIndex();
-            ProtocolBuffer buffer = metadata.getBufferValue();
-
-            if (index == 15) {
-                entity.setSize(buffer.readVarInt());
-            }
-        }
-
     }
 
 }

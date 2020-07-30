@@ -5,7 +5,6 @@ import me.hfox.craftbot.entity.data.DragonPhase;
 import me.hfox.craftbot.entity.impl.living.CraftLivingEntity;
 import me.hfox.craftbot.entity.living.LivingEntity;
 import me.hfox.craftbot.entity.living.mob.EnderDragon;
-import me.hfox.craftbot.entity.translator.HierarchyEntityIndexTranslatorBase;
 import me.hfox.craftbot.protocol.play.server.data.entity.EntityMetadata;
 import me.hfox.craftbot.protocol.stream.ProtocolBuffer;
 import me.hfox.craftbot.world.World;
@@ -31,22 +30,16 @@ public class CraftEnderDragon extends CraftMob implements EnderDragon {
         this.dragonPhase = dragonPhase;
     }
 
-    public static class Translator extends HierarchyEntityIndexTranslatorBase<EnderDragon> {
+    @Override
+    public void readMetadata(EntityMetadata metadata) throws IOException {
+        super.readMetadata(metadata);
 
-        public Translator() {
-            super(EnderDragon.class, new CraftLivingEntity.Translator());
+        int index = metadata.getIndex();
+        ProtocolBuffer buffer = metadata.getBufferValue();
+
+        if (index == 15) {
+            setDragonPhase(DragonPhase.values()[buffer.readVarInt()]);
         }
-
-        @Override
-        public void read(EnderDragon entity, EntityMetadata metadata) throws IOException {
-            int index = metadata.getIndex();
-            ProtocolBuffer buffer = metadata.getBufferValue();
-
-            if (index == 15) {
-                entity.setDragonPhase(DragonPhase.values()[buffer.readVarInt()]);
-            }
-        }
-
     }
 
 }

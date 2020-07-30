@@ -50,8 +50,6 @@ public class CraftWorld implements World {
 
     @Override
     public <E extends Entity> E addEntity(E entity) {
-        LOGGER.info("Adding {}", entity.getClass().getSimpleName());
-
         entities.put(entity.getId(), entity);
 
         synchronized (playersLock) {

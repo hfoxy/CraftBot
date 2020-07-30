@@ -4,16 +4,12 @@ import me.hfox.craftbot.entity.EntityType;
 import me.hfox.craftbot.entity.impl.living.CraftLivingEntity;
 import me.hfox.craftbot.entity.living.LivingEntity;
 import me.hfox.craftbot.entity.living.mob.animal.Pig;
-import me.hfox.craftbot.entity.living.mob.animal.Sheep;
-import me.hfox.craftbot.entity.translator.HierarchyEntityIndexTranslatorBase;
 import me.hfox.craftbot.protocol.play.server.data.entity.EntityMetadata;
 import me.hfox.craftbot.protocol.stream.ProtocolBuffer;
 import me.hfox.craftbot.world.World;
 
 import java.io.IOException;
 import java.util.UUID;
-
-import static me.hfox.craftbot.utils.BitUtils.hasFlag;
 
 public class CraftPig extends CraftAnimal implements Pig {
 
@@ -44,24 +40,18 @@ public class CraftPig extends CraftAnimal implements Pig {
         this.boostTime = boostTime;
     }
 
-    public static class Translator extends HierarchyEntityIndexTranslatorBase<Pig> {
+    @Override
+    public void readMetadata(EntityMetadata metadata) throws IOException {
+        super.readMetadata(metadata);
 
-        public Translator() {
-            super(Pig.class, new CraftLivingEntity.Translator());
+        int index = metadata.getIndex();
+        ProtocolBuffer buffer = metadata.getBufferValue();
+
+        if (index == 16) {
+            setSaddled(buffer.readBoolean());
+        } else if (index == 17) {
+            setBoostTime(buffer.readVarInt());
         }
-
-        @Override
-        public void read(Pig entity, EntityMetadata metadata) throws IOException {
-            int index = metadata.getIndex();
-            ProtocolBuffer buffer = metadata.getBufferValue();
-
-            if (index == 16) {
-                entity.setSaddled(buffer.readBoolean());
-            } else if (index == 17) {
-                entity.setBoostTime(buffer.readVarInt());
-            }
-        }
-
     }
 
 }

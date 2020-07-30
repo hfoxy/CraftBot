@@ -2,10 +2,12 @@ package me.hfox.craftbot.entity;
 
 import me.hfox.craftbot.chat.ChatComponent;
 import me.hfox.craftbot.entity.data.Pose;
+import me.hfox.craftbot.protocol.play.server.data.entity.EntityMetadata;
 import me.hfox.craftbot.world.Location;
 import me.hfox.craftbot.world.Velocity;
 import me.hfox.craftbot.world.World;
 
+import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -87,5 +89,7 @@ public interface Entity {
     void setVelocity(Velocity velocity);
 
     String getBriefInfo();
+
+    void readMetadata(EntityMetadata metadata) throws IOException;
 
 }

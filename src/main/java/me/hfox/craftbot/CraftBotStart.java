@@ -7,6 +7,7 @@ import me.hfox.craftbot.terminal.Console;
 import me.hfox.craftbot.terminal.TerminalReader;
 import me.hfox.craftbot.terminal.commands.ManagementCommands;
 import me.hfox.craftbot.terminal.commands.ServerCommands;
+import me.hfox.craftbot.world.palette.BlockPalette;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
 import org.slf4j.Logger;
@@ -23,6 +24,7 @@ public class CraftBotStart {
 
         CraftBot bot = new CraftBotImpl();
         LOGGER.info(ChatColour.AQUA + "Starting {}" + ChatColour.RED + " version {}", bot.getName(), bot.getVersion());
+        BlockPalette.load();
 
         Console console = new Console();
         Aphelion<CommandSender> aphelion = new Aphelion<CommandSender>(CommandSender.class) {

@@ -1,5 +1,6 @@
 package me.hfox.craftbot.handling;
 
+import me.hfox.craftbot.chat.ChatColour;
 import me.hfox.craftbot.entity.Entity;
 import me.hfox.craftbot.entity.EntityRegistration;
 import me.hfox.craftbot.protocol.play.client.PacketClientPlayChatMessage;

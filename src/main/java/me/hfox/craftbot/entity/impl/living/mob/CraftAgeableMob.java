@@ -4,8 +4,6 @@ import me.hfox.craftbot.entity.EntityType;
 import me.hfox.craftbot.entity.impl.living.CraftLivingEntity;
 import me.hfox.craftbot.entity.living.LivingEntity;
 import me.hfox.craftbot.entity.living.mob.AgeableMob;
-import me.hfox.craftbot.entity.living.mob.monster.Zombie;
-import me.hfox.craftbot.entity.translator.HierarchyEntityIndexTranslatorBase;
 import me.hfox.craftbot.protocol.play.server.data.entity.EntityMetadata;
 import me.hfox.craftbot.protocol.stream.ProtocolBuffer;
 import me.hfox.craftbot.world.World;
@@ -31,22 +29,16 @@ public class CraftAgeableMob extends CraftPathfinderMob implements AgeableMob {
         this.baby = baby;
     }
 
-    public static class Translator extends HierarchyEntityIndexTranslatorBase<AgeableMob> {
+    @Override
+    public void readMetadata(EntityMetadata metadata) throws IOException {
+        super.readMetadata(metadata);
 
-        public Translator() {
-            super(AgeableMob.class, new CraftLivingEntity.Translator());
+        int index = metadata.getIndex();
+        ProtocolBuffer buffer = metadata.getBufferValue();
+
+        if (index == 15) {
+            setBaby(buffer.readBoolean());
         }
-
-        @Override
-        public void read(AgeableMob entity, EntityMetadata metadata) throws IOException {
-            int index = metadata.getIndex();
-            ProtocolBuffer buffer = metadata.getBufferValue();
-
-            if (index == 15) {
-                entity.setBaby(buffer.readBoolean());
-            }
-        }
-
     }
 
 }

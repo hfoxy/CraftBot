@@ -33,30 +33,30 @@ import me.hfox.craftbot.entity.thrown.*;
 
 public class Entities {
 
-    public static final EntityType<Arrow, ?> ARROW = new EntityType<>(CraftArrow.class, 2, "Arrow", "minecraft:arrow", EntityCreationData.class, new CraftArrow.Translator());
-    public static final EntityType<Bat, ?> BAT = new EntityType<>(CraftBat.class, 3, "Bat", "minecraft:bat", EntityCreationData.class, new CraftBat.Translator());
-    public static final EntityType<Chicken, ?> CHICKEN = new EntityType<>(CraftChicken.class, 9, "Chicken", "minecraft:chicken", EntityCreationData.class, new CraftAgeableMob.Translator());
-    public static final EntityType<Cow, ?> COW = new EntityType<>(CraftCow.class, 11, "Cow", "minecraft:cow", EntityCreationData.class, new CraftAgeableMob.Translator());
-    public static final EntityType<Creeper, ?> CREEPER = new EntityType<>(CraftCreeper.class, 12, "Creeper", "minecraft:creeper", EntityCreationData.class, new CraftCreeper.Translator());
-    public static final EntityType<EnderDragon, ?> ENDER_DRAGON = new EntityType<>(CraftEnderDragon.class, 19, "Ender Dragon", "minecraft:ender_dragon", EntityCreationData.class, new CraftEnderDragon.Translator());
-    public static final EntityType<Enderman, ?> ENDERMAN = new EntityType<>(CraftEnderman.class, 20, "Enderman", "minecraft:enderman", EntityCreationData.class, new CraftEnderman.Translator());
-    public static final EntityType<Skeleton, ?> SKELETON = new EntityType<>(CraftSkeleton.class, 66, "Skeleton", "minecraft:skeleton", EntityCreationData.class, new CraftLivingEntity.Translator());
-    public static final EntityType<EyeOfEnder, ?> EYE_OF_ENDER = new EntityType<>(CraftEyeOfEnder.class, 25, "Eye of Ender", "minecraft:eye_of_ender", EntityCreationData.class, new CraftEyeOfEnder.Translator());
-    public static final EntityType<ItemEntity, ?> ITEM = new EntityType<>(CraftItemEntity.class, 35, "Item", "minecraft:item", EntityCreationData.class, new CraftItemEntity.Translator());
-    public static final EntityType<Pig, ?> PIG = new EntityType<>(CraftPig.class, 55, "Pig", "minecraft:pig", EntityCreationData.class, new CraftPig.Translator());
-    public static final EntityType<Sheep, ?> SHEEP = new EntityType<>(CraftSheep.class, 62, "Sheep", "minecraft:sheep", EntityCreationData.class, new CraftSheep.Translator());
-    public static final EntityType<Slime, ?> SLIME = new EntityType<>(CraftSlime.class, 68, "Slime", "minecraft:slime", EntityCreationData.class, new CraftSlime.Translator());
-    public static final EntityType<Snowball, ?> SNOWBALL = new EntityType<>(CraftSnowball.class, 71, "Snowball", "minecraft:snowball", EntityCreationData.class, new CraftSnowball.Translator());
-    public static final EntityType<Spider, ?> SPIDER = new EntityType<>(CraftSpider.class, 73, "Spider", "minecraft:spider", EntityCreationData.class, new CraftSpider.Translator());
-    public static final EntityType<ThrownEgg, ?> THROWN_EGG = new EntityType<>(CraftThrownEgg.class, 79, "Thrown Egg", "minecraft:thrown_egg", EntityCreationData.class, new CraftThrownEgg.Translator());
-    public static final EntityType<ThrownEnderPearl, ?> THROWN_ENDER_PEARL = new EntityType<>(CraftThrownEnderPearl.class, 80, "Thrown Ender Pearl", "minecraft:thrown_ender_pearl", EntityCreationData.class, new CraftThrownEnderPearl.Translator());
-    public static final EntityType<ThrownExperienceBottle, ?> THROWN_EXPERIENCE_BOTTLE = new EntityType<>(CraftThrownExperienceBottle.class, 81, "Thrown Bottle o' Enchanting", "minecraft:experience_bottle", EntityCreationData.class, new CraftThrownExperienceBottle.Translator());
-    public static final EntityType<ThrownPotion, ?> THROWN_POTION = new EntityType<>(CraftThrownPotion.class, 82, "Potion", "minecraft:potion", EntityCreationData.class, new CraftThrownPotion.Translator());
-    public static final EntityType<ThrownTrident, ?> TRIDENT = new EntityType<>(CraftThrownTrident.class, 83, "Trident", "minecraft:trident", EntityCreationData.class, new CraftThrownTrident.Translator());
-    public static final EntityType<Witch, ?> WITCH = new EntityType<>(CraftWitch.class, 90, "Witch", "minecraft:witch", EntityCreationData.class, new CraftWitch.Translator());
-    public static final EntityType<Zombie, ?> ZOMBIE = new EntityType<>(CraftZombie.class, 95, "Zombie", "minecraft:zombie", EntityCreationData.class, new CraftZombie.Translator());
-    public static final EntityType<Phantom, ?> PHANTOM = new EntityType<>(CraftPhantom.class, 98, "Phantom", "minecraft:phantom", EntityCreationData.class, new CraftPhantom.Translator());
-    public static final EntityType<Player, PlayerCreationData> PLAYER = new PlayerEntityType(106, "Player", "minecraft:player");
+    public static final EntityType<Arrow, ?> ARROW = new BaseEntityType<>(CraftArrow.class, 2, "minecraft:arrow");
+    public static final EntityType<Bat, ?> BAT = new BaseEntityType<>(CraftBat.class, 3, "minecraft:bat");
+    public static final EntityType<Chicken, ?> CHICKEN = new BaseEntityType<>(CraftChicken.class, 9, "minecraft:chicken");
+    public static final EntityType<Cow, ?> COW = new BaseEntityType<>(CraftCow.class, 11, "minecraft:cow");
+    public static final EntityType<Creeper, ?> CREEPER = new BaseEntityType<>(CraftCreeper.class, 12, "minecraft:creeper");
+    public static final EntityType<EnderDragon, ?> ENDER_DRAGON = new BaseEntityType<>(CraftEnderDragon.class, 19, "minecraft:ender_dragon");
+    public static final EntityType<Enderman, ?> ENDERMAN = new BaseEntityType<>(CraftEnderman.class, 20, "minecraft:enderman");
+    public static final EntityType<Skeleton, ?> SKELETON = new BaseEntityType<>(CraftSkeleton.class, 66, "minecraft:skeleton");
+    public static final EntityType<EyeOfEnder, ?> EYE_OF_ENDER = new BaseEntityType<>(CraftEyeOfEnder.class, 25, "minecraft:eye_of_ender");
+    public static final EntityType<ItemEntity, ?> ITEM = new BaseEntityType<>(CraftItemEntity.class, 35, "minecraft:item");
+    public static final EntityType<Pig, ?> PIG = new BaseEntityType<>(CraftPig.class, 55, "minecraft:pig");
+    public static final EntityType<Sheep, ?> SHEEP = new BaseEntityType<>(CraftSheep.class, 62, "minecraft:sheep");
+    public static final EntityType<Slime, ?> SLIME = new BaseEntityType<>(CraftSlime.class, 68, "minecraft:slime");
+    public static final EntityType<Snowball, ?> SNOWBALL = new BaseEntityType<>(CraftSnowball.class, 71, "minecraft:snowball");
+    public static final EntityType<Spider, ?> SPIDER = new BaseEntityType<>(CraftSpider.class, 73, "minecraft:spider");
+    public static final EntityType<ThrownEgg, ?> THROWN_EGG = new BaseEntityType<>(CraftThrownEgg.class, 79, "minecraft:thrown_egg");
+    public static final EntityType<ThrownEnderPearl, ?> THROWN_ENDER_PEARL = new BaseEntityType<>(CraftThrownEnderPearl.class, 80, "minecraft:thrown_ender_pearl");
+    public static final EntityType<ThrownExperienceBottle, ?> THROWN_EXPERIENCE_BOTTLE = new BaseEntityType<>(CraftThrownExperienceBottle.class, 81, "minecraft:experience_bottle");
+    public static final EntityType<ThrownPotion, ?> THROWN_POTION = new BaseEntityType<>(CraftThrownPotion.class, 82, "minecraft:potion");
+    public static final EntityType<ThrownTrident, ?> TRIDENT = new BaseEntityType<>(CraftThrownTrident.class, 83, "minecraft:trident");
+    public static final EntityType<Witch, ?> WITCH = new BaseEntityType<>(CraftWitch.class, 90, "minecraft:witch");
+    public static final EntityType<Zombie, ?> ZOMBIE = new BaseEntityType<>(CraftZombie.class, 95, "minecraft:zombie");
+    public static final EntityType<Phantom, ?> PHANTOM = new BaseEntityType<>(CraftPhantom.class, 98, "minecraft:phantom");
+    public static final EntityType<Player, PlayerCreationData> PLAYER = new PlayerEntityType(106, "minecraft:player");
 
     public static void load() {
         // actually does nothing, but it means the fields are instantiated

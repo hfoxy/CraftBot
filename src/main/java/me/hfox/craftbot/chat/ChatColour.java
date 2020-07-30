@@ -98,4 +98,8 @@ public enum ChatColour {
         return jansiReplacement;
     }
 
+    public String toClientString() {
+        return SPECIAL_TOKEN + "" + key;
+    }
+
 }

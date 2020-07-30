@@ -1,13 +1,9 @@
 package me.hfox.craftbot.entity.impl.living.mob.monster;
 
 import me.hfox.craftbot.entity.EntityType;
-import me.hfox.craftbot.entity.impl.CraftEntity;
 import me.hfox.craftbot.entity.impl.living.CraftLivingEntity;
 import me.hfox.craftbot.entity.living.LivingEntity;
-import me.hfox.craftbot.entity.living.mob.monster.SkeletonBase;
 import me.hfox.craftbot.entity.living.mob.monster.Zombie;
-import me.hfox.craftbot.entity.thrown.ThrownEgg;
-import me.hfox.craftbot.entity.translator.HierarchyEntityIndexTranslatorBase;
 import me.hfox.craftbot.protocol.play.server.data.entity.EntityMetadata;
 import me.hfox.craftbot.protocol.stream.ProtocolBuffer;
 import me.hfox.craftbot.world.World;
@@ -45,27 +41,21 @@ public class CraftZombie extends CraftMonster implements Zombie {
         this.becomingDrowned = becomingDrowned;
     }
 
-    public static class Translator extends HierarchyEntityIndexTranslatorBase<Zombie> {
+    @Override
+    public void readMetadata(EntityMetadata metadata) throws IOException {
+        super.readMetadata(metadata);
 
-        public Translator() {
-            super(Zombie.class, new CraftLivingEntity.Translator());
+        int index = metadata.getIndex();
+        ProtocolBuffer buffer = metadata.getBufferValue();
+
+        if (index == 15) {
+            setBaby(buffer.readBoolean());
+        } else if (index == 16) {
+            // unused
+            // entity.setTypeId(buffer.readVarInt());
+        } else if (index == 17) {
+            setBecomingDrowned(buffer.readBoolean());
         }
-
-        @Override
-        public void read(Zombie entity, EntityMetadata metadata) throws IOException {
-            int index = metadata.getIndex();
-            ProtocolBuffer buffer = metadata.getBufferValue();
-
-            if (index == 15) {
-                entity.setBaby(buffer.readBoolean());
-            } else if (index == 16) {
-                // unused
-                // entity.setTypeId(buffer.readVarInt());
-            } else if (index == 17) {
-                entity.setBecomingDrowned(buffer.readBoolean());
-            }
-        }
-
     }
 
 }

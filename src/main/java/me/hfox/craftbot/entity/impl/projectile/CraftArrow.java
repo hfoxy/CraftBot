@@ -4,8 +4,6 @@ import me.hfox.craftbot.entity.Entity;
 import me.hfox.craftbot.entity.EntityType;
 import me.hfox.craftbot.entity.impl.CraftEntity;
 import me.hfox.craftbot.entity.projectile.Arrow;
-import me.hfox.craftbot.entity.translator.EntityIndexTranslatorBase;
-import me.hfox.craftbot.entity.translator.HierarchyEntityIndexTranslatorBase;
 import me.hfox.craftbot.protocol.play.server.data.entity.EntityMetadata;
 import me.hfox.craftbot.protocol.stream.ProtocolBuffer;
 import me.hfox.craftbot.world.World;
@@ -66,28 +64,22 @@ public class CraftArrow extends CraftEntity implements Arrow {
         this.colour = colour;
     }
 
-    public static class Translator extends HierarchyEntityIndexTranslatorBase<Arrow> {
+    @Override
+    public void readMetadata(EntityMetadata metadata) throws IOException {
+        super.readMetadata(metadata);
 
-        public Translator() {
-            super(Arrow.class, new CraftEntity.Translator());
+        int index = metadata.getIndex();
+        ProtocolBuffer buffer = metadata.getBufferValue();
+
+        if (index == 7) {
+            byte flags = buffer.readByte();
+            setCritical(hasFlag(flags, 0x01));
+            setNoClip(hasFlag(flags, 0x02));
+        } else if (index == 8) {
+            setPiercingLevel(buffer.readByte());
+        } else if (index == 9) {
+            setColour(buffer.readVarInt());
         }
-
-        @Override
-        public void read(Arrow entity, EntityMetadata metadata) throws IOException {
-            int index = metadata.getIndex();
-            ProtocolBuffer buffer = metadata.getBufferValue();
-
-            if (index == 7) {
-                byte flags = buffer.readByte();
-                entity.setCritical(hasFlag(flags, 0x01));
-                entity.setNoClip(hasFlag(flags, 0x02));
-            } else if (index == 8) {
-                entity.setPiercingLevel(buffer.readByte());
-            } else if (index == 9) {
-                entity.setColour(buffer.readVarInt());
-            }
-        }
-
     }
 
 }

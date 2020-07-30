@@ -4,8 +4,6 @@ import me.hfox.craftbot.entity.EntityType;
 import me.hfox.craftbot.entity.impl.living.CraftLivingEntity;
 import me.hfox.craftbot.entity.living.LivingEntity;
 import me.hfox.craftbot.entity.living.mob.monster.Raider;
-import me.hfox.craftbot.entity.living.mob.monster.Zombie;
-import me.hfox.craftbot.entity.translator.HierarchyEntityIndexTranslatorBase;
 import me.hfox.craftbot.protocol.play.server.data.entity.EntityMetadata;
 import me.hfox.craftbot.protocol.stream.ProtocolBuffer;
 import me.hfox.craftbot.world.World;
@@ -31,22 +29,16 @@ public class CraftRaider extends CraftMonster implements Raider {
         this.celebrating = celebrating;
     }
 
-    public static class Translator extends HierarchyEntityIndexTranslatorBase<Raider> {
+    @Override
+    public void readMetadata(EntityMetadata metadata) throws IOException {
+        super.readMetadata(metadata);
 
-        public Translator() {
-            super(Raider.class, new CraftLivingEntity.Translator());
+        int index = metadata.getIndex();
+        ProtocolBuffer buffer = metadata.getBufferValue();
+
+        if (index == 15) {
+            setCelebrating(buffer.readBoolean());
         }
-
-        @Override
-        public void read(Raider entity, EntityMetadata metadata) throws IOException {
-            int index = metadata.getIndex();
-            ProtocolBuffer buffer = metadata.getBufferValue();
-
-            if (index == 15) {
-                entity.setCelebrating(buffer.readBoolean());
-            }
-        }
-
     }
 
 }

@@ -1,12 +1,14 @@
 package me.hfox.craftbot.entity.living.mob.monster;
 
+import me.hfox.craftbot.world.palette.BlockStateDto;
+
 import java.util.Optional;
 
 public interface Enderman extends Monster {
 
-    Optional<Integer> getCarriedBlock();
+    Optional<BlockStateDto> getCarriedBlock();
 
-    void setCarriedBlock(Integer carriedBlock);
+    void setCarriedBlock(BlockStateDto carriedBlock);
 
     boolean isScreaming();
 
