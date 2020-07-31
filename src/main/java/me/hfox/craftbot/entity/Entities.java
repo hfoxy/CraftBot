@@ -1,5 +1,6 @@
 package me.hfox.craftbot.entity;
 
+import me.hfox.craftbot.entity.data.creation.ClientPlayerEntityType;
 import me.hfox.craftbot.entity.data.creation.EntityCreationData;
 import me.hfox.craftbot.entity.data.creation.PlayerCreationData;
 import me.hfox.craftbot.entity.data.creation.PlayerEntityType;
@@ -18,6 +19,7 @@ import me.hfox.craftbot.entity.impl.living.mob.flying.CraftPhantom;
 import me.hfox.craftbot.entity.impl.living.mob.monster.*;
 import me.hfox.craftbot.entity.impl.projectile.CraftArrow;
 import me.hfox.craftbot.entity.impl.thrown.*;
+import me.hfox.craftbot.entity.living.ClientPlayer;
 import me.hfox.craftbot.entity.living.Player;
 import me.hfox.craftbot.entity.living.mob.EnderDragon;
 import me.hfox.craftbot.entity.living.mob.Slime;
@@ -58,7 +60,7 @@ public class Entities {
     public static final EntityType<ZombieVillager, ?> ZOMBIE_VILLAGER = new BaseEntityType<>(CraftZombieVillager.class, 97, "minecraft:zombie_villager");
     public static final EntityType<Phantom, ?> PHANTOM = new BaseEntityType<>(CraftPhantom.class, 98, "minecraft:phantom");
     public static final EntityType<Player, PlayerCreationData> PLAYER = new PlayerEntityType(106, "minecraft:player");
-    public static final EntityType<Player, PlayerCreationData> CLIENT_PLAYER = new PlayerEntityType(999, "minecraft:player");
+    public static final EntityType<ClientPlayer, PlayerCreationData> CLIENT_PLAYER = new ClientPlayerEntityType(999, "minecraft:client_player");
 
     public static void load() {
         // actually does nothing, but it means the fields are instantiated

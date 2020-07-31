@@ -79,12 +79,14 @@ public class ClientHandler {
 
     public void onReceive(ServerPacket packet) {
         if (packet instanceof PacketServerPlayJoinGame) {
+            LOGGER.info("Attempting to join game");
             PacketServerPlayJoinGame joinGame = (PacketServerPlayJoinGame) packet;
 
             World world = worldHandler.getWorld();
             player = EntityRegistration.createClientPlayer(new PlayerCreationData(
                     world, joinGame.getEntityId(), client.getUniqueId(), playerInfo.get(client.getUniqueId())
             ));
+            LOGGER.info("Joined game");
         }
 
         worldHandler.onReceive(packet);
