@@ -58,6 +58,7 @@ public class Entities {
     public static final EntityType<ZombieVillager, ?> ZOMBIE_VILLAGER = new BaseEntityType<>(CraftZombieVillager.class, 97, "minecraft:zombie_villager");
     public static final EntityType<Phantom, ?> PHANTOM = new BaseEntityType<>(CraftPhantom.class, 98, "minecraft:phantom");
     public static final EntityType<Player, PlayerCreationData> PLAYER = new PlayerEntityType(106, "minecraft:player");
+    public static final EntityType<Player, PlayerCreationData> CLIENT_PLAYER = new PlayerEntityType(999, "minecraft:player");
 
     public static void load() {
         // actually does nothing, but it means the fields are instantiated

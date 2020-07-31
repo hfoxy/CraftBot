@@ -2,13 +2,15 @@ package me.hfox.craftbot.handling;
 
 import me.hfox.craftbot.connection.Connection;
 import me.hfox.craftbot.connection.client.Client;
+import me.hfox.craftbot.entity.Entities;
+import me.hfox.craftbot.entity.EntityRegistration;
 import me.hfox.craftbot.entity.data.PlayerInfo;
+import me.hfox.craftbot.entity.data.creation.PlayerCreationData;
+import me.hfox.craftbot.entity.living.ClientPlayer;
 import me.hfox.craftbot.protocol.ClientPacket;
 import me.hfox.craftbot.protocol.ServerPacket;
-import me.hfox.craftbot.protocol.play.server.PacketServerPlayPlayerInfo;
-import me.hfox.craftbot.protocol.play.server.PacketServerPlaySpawnEntity;
-import me.hfox.craftbot.protocol.play.server.PacketServerPlaySpawnLivingEntity;
-import me.hfox.craftbot.protocol.play.server.PacketServerPlaySpawnPlayer;
+import me.hfox.craftbot.protocol.play.server.*;
+import me.hfox.craftbot.world.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +35,7 @@ public class ClientHandler {
 
     private final Map<UUID, PlayerInfo> playerInfo;
 
+    private ClientPlayer player;
     private Future<?> tickTask;
 
     public ClientHandler(Client client) {
@@ -48,6 +51,10 @@ public class ClientHandler {
 
     public WorldHandler getWorldHandler() {
         return worldHandler;
+    }
+
+    public ClientPlayer getPlayer() {
+        return player;
     }
 
     public void start() {
@@ -71,6 +78,15 @@ public class ClientHandler {
     }
 
     public void onReceive(ServerPacket packet) {
+        if (packet instanceof PacketServerPlayJoinGame) {
+            PacketServerPlayJoinGame joinGame = (PacketServerPlayJoinGame) packet;
+
+            World world = worldHandler.getWorld();
+            player = EntityRegistration.createClientPlayer(new PlayerCreationData(
+                    world, joinGame.getEntityId(), client.getUniqueId(), playerInfo.get(client.getUniqueId())
+            ));
+        }
+
         worldHandler.onReceive(packet);
     }
 

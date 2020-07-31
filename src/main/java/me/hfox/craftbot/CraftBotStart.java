@@ -6,6 +6,7 @@ import me.hfox.craftbot.terminal.CommandSender;
 import me.hfox.craftbot.terminal.Console;
 import me.hfox.craftbot.terminal.TerminalReader;
 import me.hfox.craftbot.terminal.commands.ManagementCommands;
+import me.hfox.craftbot.terminal.commands.PathingCommands;
 import me.hfox.craftbot.terminal.commands.ServerCommands;
 import me.hfox.craftbot.world.palette.BlockPalette;
 import org.fusesource.jansi.Ansi;
@@ -36,6 +37,7 @@ public class CraftBotStart {
 
         aphelion.getRegistration().register(ManagementCommands.class);
         aphelion.getRegistration().register(ServerCommands.class);
+        aphelion.getRegistration().register(PathingCommands.class);
 
         TerminalReader terminal = new TerminalReader(console, aphelion);
         terminal.start();
