@@ -67,6 +67,7 @@ public class JavaProtocol extends RegistryProtocol implements Protocol {
         registerClient(ProtocolState.PLAY, 0x05, PacketClientPlayClientSettings.class);
         registerClient(ProtocolState.PLAY, 0x0F, PacketClientPlayKeepAlive.class);
         registerClient(ProtocolState.PLAY, 0x11, PacketClientPlayPlayerPosition.class);
+        registerClient(ProtocolState.PLAY, 0x12, PacketClientPlayPlayerPositionAndRotation.class);
         registerClient(ProtocolState.PLAY, 0x14, PacketClientPlayPlayerMovement.class);
         registerClient(ProtocolState.PLAY, 0x1B, PacketClientPlayEntityAction.class);
 

@@ -57,6 +57,10 @@ public class ClientHandler {
         return client;
     }
 
+    public TickHandler getTickHandler() {
+        return tickHandler;
+    }
+
     public WorldHandler getWorldHandler() {
         return worldHandler;
     }

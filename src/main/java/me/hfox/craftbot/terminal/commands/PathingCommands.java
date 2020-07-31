@@ -26,6 +26,11 @@ public class PathingCommands {
 
     public static WorldHandler WORLD_HANDLER;
 
+    @Command(aliases = {"path-recalculate", "p-rc"}, description = "Recalculate path lookup table", max = 0)
+    public static void pathRecalculate(CommandSender sender, CommandContext<CommandSender> args) throws CommandException, InterruptedException, AStar.InvalidPathException {
+        WORLD_HANDLER.getClientHandler().getTickHandler().recalculateDiffLookupTables();
+    }
+
     @Command(aliases = {"path"}, description = "Find a path", max = 3)
     public static void path(CommandSender sender, CommandContext<CommandSender> args) throws CommandException, InterruptedException, AStar.InvalidPathException {
         if (WORLD_HANDLER == null) {
@@ -46,30 +51,6 @@ public class PathingCommands {
 
         PathingResult result = WORLD_HANDLER.getClientHandler().path(end, 100);
         sender.sendMessage("Result: " + result);
-    }
-
-    @Command(aliases = {"connect"}, description = "Connect to a server", usage = "[host{:port}]", min = 1, max = 1)
-    public static void connect(CommandSender sender, CommandContext<CommandSender> args) throws CommandException {
-        String host = args.getString(0);
-        int port = 25565;
-        if (host.contains(":")) {
-            String[] split = host.split(":");
-            if (split.length != 2) {
-                throw new CommandUsageException("Invalid form of host");
-            }
-
-            host = split[0];
-        }
-
-        sender.sendMessage(Level.INFO, "Attempting to connect to {}:{}", host, port);
-
-        PlayClient playClient = new PlayClient();
-
-        try {
-            playClient.connect(host, port);
-        } catch (BotConnectionException ex) {
-            sender.sendException("Unable to connect", ex);
-        }
     }
 
 }

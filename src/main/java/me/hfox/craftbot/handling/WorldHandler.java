@@ -58,8 +58,6 @@ public class WorldHandler {
 
             world.addEntity(player);
             LOGGER.debug("Added Player entity for '{}' - {}", info.getName(), info.getUuid());
-
-            clientHandler.getClient().getConnection().writePacket(new PacketClientPlayChatMessage("Hello " + player.getName()));
         } else if (packet instanceof PacketServerPlaySpawnEntity) {
             PacketServerPlaySpawnEntity spawn = (PacketServerPlaySpawnEntity) packet;
             EntityCreationData ecd = new EntityCreationData(world, spawn.getId(), spawn.getUuid());

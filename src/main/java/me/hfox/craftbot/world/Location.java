@@ -131,12 +131,20 @@ public class Location {
         }
     }
 
+    public Location plus(Location location) {
+        return plus(location.getX(), location.getY(), location.getZ());
+    }
+
     public Location plus(double x, double y, double z) {
         return new Location(getX() + x, getY() + y, getZ() + z);
     }
 
     public Location plus(int x, int y, int z) {
         return new Location(getBlockX() + x, getBlockY() + y, getBlockZ() + z);
+    }
+
+    public Location minus(Location location) {
+        return minus(location.getX(), location.getY(), location.getZ());
     }
 
     public Location minus(double x, double y, double z) {
