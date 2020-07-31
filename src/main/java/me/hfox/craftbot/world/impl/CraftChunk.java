@@ -61,7 +61,12 @@ public class CraftChunk implements Chunk {
 
     @Override
     public BlockStateDto getBlockAt(Location location) {
-        checkValid(location);
+        try {
+            checkValid(location);
+        } catch (Exception ex) {
+            return null;
+        }
+
         // LOGGER.info("blocks... {} -{}", blocks, "done");
         return blocks[location.getChunkBlockX()][location.getBlockY()][location.getChunkBlockZ()];
     }
@@ -72,11 +77,6 @@ public class CraftChunk implements Chunk {
         Preconditions.checkNotNull(blockState, "blockState should not be null");
 
         checkValid(location);
-
-        if (!blockState.getBlock().getIdentifier().equalsIgnoreCase("minecraft:air")) {
-            // LOGGER.info("Setting block @ {} to '{}'", location, blockState.getBlock().getIdentifier());
-        }
-
         blocks[location.getChunkBlockX()][location.getBlockY()][location.getChunkBlockZ()] = blockState;
     }
 

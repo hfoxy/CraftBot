@@ -155,12 +155,10 @@ class ChunkStreamTest {
             longs.add(l);
         }
 
-        assertEquals(bitsPerBlock * 512, longs.size());
-
         ChunkStream stream = new ChunkStream(longs, bitsPerBlock);
-        for (int x = 0; x < 16; x++) {
+        for (int y = 0; y < 16; y++) {
             for (int z = 0; z < 16; z++) {
-                for (int y = 0; y < 16; y++) {
+                for (int x = 0; x < 16; x++) {
                     int blockId = palette[stream.read()];
                     BlockStateDto blockState = BlockPalette.findById(blockId).orElseThrow(() -> new BotUnknownBlockException(Integer.toString(blockId)));
                 }
