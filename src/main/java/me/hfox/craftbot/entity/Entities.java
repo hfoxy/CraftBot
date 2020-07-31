@@ -55,6 +55,7 @@ public class Entities {
     public static final EntityType<ThrownTrident, ?> TRIDENT = new BaseEntityType<>(CraftThrownTrident.class, 83, "minecraft:trident");
     public static final EntityType<Witch, ?> WITCH = new BaseEntityType<>(CraftWitch.class, 90, "minecraft:witch");
     public static final EntityType<Zombie, ?> ZOMBIE = new BaseEntityType<>(CraftZombie.class, 95, "minecraft:zombie");
+    public static final EntityType<ZombieVillager, ?> ZOMBIE_VILLAGER = new BaseEntityType<>(CraftZombieVillager.class, 97, "minecraft:zombie_villager");
     public static final EntityType<Phantom, ?> PHANTOM = new BaseEntityType<>(CraftPhantom.class, 98, "minecraft:phantom");
     public static final EntityType<Player, PlayerCreationData> PLAYER = new PlayerEntityType(106, "minecraft:player");
 

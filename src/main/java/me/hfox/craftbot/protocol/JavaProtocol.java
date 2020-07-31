@@ -77,13 +77,14 @@ public class JavaProtocol extends RegistryProtocol implements Protocol {
         registerServer(ProtocolState.PLAY, 0x0C, PacketServerPlayBlockChange.class);
         registerServer(ProtocolState.PLAY, 0x0E, PacketServerPlayServerDifficulty.class);
         registerServer(ProtocolState.PLAY, 0x0F, PacketServerPlayChatMessage.class);
-        registerServer(ProtocolState.PLAY, 0x1B, PacketServerPlayDisconnect.class);
-        registerServer(ProtocolState.PLAY, 0x1F, PacketServerPlayChangeGameState.class);
+        registerServer(ProtocolState.PLAY, 0x10, PacketServerPlayMultiBlockChange.class);
         registerServer(ProtocolState.PLAY, 0x12, PacketServerPlayDeclareCommands.class);
         registerServer(ProtocolState.PLAY, 0x15, PacketServerPlayWindowItems.class);
         registerServer(ProtocolState.PLAY, 0x17, PacketServerPlaySetSlot.class);
         registerServer(ProtocolState.PLAY, 0x18, PacketServerPlaySetCooldown.class);
         registerServer(ProtocolState.PLAY, 0x19, PacketServerPlayPluginMessage.class);
+        registerServer(ProtocolState.PLAY, 0x1B, PacketServerPlayDisconnect.class);
+        registerServer(ProtocolState.PLAY, 0x1F, PacketServerPlayChangeGameState.class);
         registerServer(ProtocolState.PLAY, 0x1C, PacketServerPlayEntityStatus.class);
         registerServer(ProtocolState.PLAY, 0x1E, PacketServerPlayUnloadChunk.class);
         registerServer(ProtocolState.PLAY, 0x21, PacketServerPlayKeepAlive.class);
