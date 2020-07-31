@@ -11,6 +11,7 @@ import me.hfox.craftbot.protocol.stream.ProtocolBuffer;
 import me.hfox.craftbot.world.Direction;
 import me.hfox.craftbot.world.Location;
 import me.hfox.craftbot.world.Rotation;
+import me.hfox.craftbot.world.palette.BlockStateDto;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -98,7 +99,7 @@ public enum EntityMetadataType {
     },
     BLOCK_ID_OPTIONAL(13) {
         @Override
-        public Optional<Integer> read(ProtocolBuffer buffer) {
+        public Optional<BlockStateDto> read(ProtocolBuffer buffer) {
             return buffer.readBlockStateOptional();
         }
     },

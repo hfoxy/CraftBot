@@ -27,10 +27,12 @@ public class WorldHandler {
 
     private final ClientHandler clientHandler;
     private final World world;
+    private final ChunkHandler chunkHandler;
 
     public WorldHandler(ClientHandler clientHandler) {
         this.clientHandler = clientHandler;
         this.world = new CraftWorld(clientHandler.getClient());
+        this.chunkHandler = new ChunkHandler(this);
         Entities.load();
     }
 
@@ -141,6 +143,8 @@ public class WorldHandler {
                 entity.setLocation(location);
             });
         }
+
+        chunkHandler.onReceive(packet);
     }
 
 }

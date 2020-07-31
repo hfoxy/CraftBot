@@ -18,9 +18,9 @@ public class Location {
     }
 
     public Location(int blockX, int blockY, int blockZ) {
-        this.blockX = blockX;
-        this.blockY = blockY;
-        this.blockZ = blockZ;
+        setBlockX(blockX);
+        setBlockY(blockY);
+        setBlockZ(blockZ);
     }
 
     public Location(double x, double y, double z) {
@@ -28,9 +28,9 @@ public class Location {
     }
 
     public Location(double x, double y, double z, float yaw, float pitch) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        setX(x);
+        setY(y);
+        setZ(z);
         this.yaw = yaw;
         this.pitch = pitch;
     }
@@ -41,6 +41,7 @@ public class Location {
 
     public void setX(double x) {
         this.x = x;
+        this.blockX = (int) Math.floor(x);
     }
 
     public double getY() {
@@ -49,6 +50,7 @@ public class Location {
 
     public void setY(double y) {
         this.y = y;
+        this.blockY = (int) Math.floor(y);
     }
 
     public double getZ() {
@@ -57,6 +59,7 @@ public class Location {
 
     public void setZ(double z) {
         this.z = z;
+        this.blockZ = (int) Math.floor(z);
     }
 
     public float getYaw() {
@@ -81,6 +84,20 @@ public class Location {
 
     public void setBlockX(int blockX) {
         this.blockX = blockX;
+        this.x = blockX - 0.5D;
+    }
+
+    public int getChunkX() {
+        return (int) Math.floor((double) getBlockX() / 16);
+    }
+
+    public int getChunkBlockX() {
+        int chunkX = getChunkX();
+        if (chunkX < 0) {
+            return getBlockX() - (chunkX * 16);
+        } else {
+            return getBlockX() % 16;
+        }
     }
 
     public int getBlockY() {
@@ -89,6 +106,7 @@ public class Location {
 
     public void setBlockY(int blockY) {
         this.blockY = blockY;
+        this.y = blockY;
     }
 
     public int getBlockZ() {
@@ -97,6 +115,28 @@ public class Location {
 
     public void setBlockZ(int blockZ) {
         this.blockZ = blockZ;
+        this.z = blockZ + 0.5D;
+    }
+
+    public int getChunkZ() {
+        return (int) Math.floor((double) getBlockZ() / 16);
+    }
+
+    public int getChunkBlockZ() {
+        int chunkZ = getChunkZ();
+        if (chunkZ < 0) {
+            return getBlockZ() - (chunkZ * 16);
+        } else {
+            return getBlockZ() % 16;
+        }
+    }
+
+    public Location plus(double x, double y, double z) {
+        return new Location(getX() + x, getY() + y, getZ() + z);
+    }
+
+    public Location minus(double x, double y, double z) {
+        return new Location(getX() - x, getY() - y, getZ() - z);
     }
 
     public Location copy() {
@@ -116,8 +156,11 @@ public class Location {
     public String toString() {
         final StringBuilder sb = new StringBuilder("Location{");
         sb.append("x=").append(x);
+        sb.append(", blockX=").append(blockX);
         sb.append(", y=").append(y);
+        sb.append(", blockY=").append(blockY);
         sb.append(", z=").append(z);
+        sb.append(", blockZ=").append(blockZ);
         sb.append(", yaw=").append(yaw);
         sb.append(", pitch=").append(pitch);
         sb.append('}');

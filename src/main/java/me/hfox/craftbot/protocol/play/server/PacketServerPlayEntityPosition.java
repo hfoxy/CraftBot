@@ -19,15 +19,15 @@ public class PacketServerPlayEntityPosition implements ServerPacket {
     }
 
     public double getDeltaX() {
-        return deltaX;
+        return deltaX / (128D * 32);
     }
 
     public double getDeltaY() {
-        return deltaY;
+        return deltaY / (128D * 32);
     }
 
     public double getDeltaZ() {
-        return deltaZ;
+        return deltaZ / (128D * 32);
     }
 
     public boolean isGrounded() {

@@ -3,6 +3,7 @@ package me.hfox.craftbot.world.palette;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import me.hfox.craftbot.CraftBotStart;
+import me.hfox.craftbot.exception.world.BotUnknownBlockException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,9 +34,16 @@ public class BlockPalette {
 
         Map<String, BlockDto> map = mapper.readValue(paletteInput, typeRef);
         Set<BlockStateDto> states = new HashSet<>();
-        for (BlockDto block : map.values()) {
+        for (Map.Entry<String, BlockDto> entry : map.entrySet()) {
+            BlockDto block = entry.getValue();
+            block.setIdentifier(entry.getKey());
+
             for (BlockStateDto state : block.getStates()) {
-                BLOCK_STATES.put(state.getId(), state);
+                state.setBlock(block);
+                BlockStateDto old = BLOCK_STATES.put(state.getId(), state);
+                if (old != null) {
+                    throw new BotUnknownBlockException("Block ID " + state.getId() + " already exists");
+                }
             }
 
             states.addAll(block.getStates());

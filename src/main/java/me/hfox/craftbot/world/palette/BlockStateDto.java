@@ -1,10 +1,15 @@
 package me.hfox.craftbot.world.palette;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import me.hfox.craftbot.utils.ToStringBuilder;
 
 import java.util.Map;
 
 public class BlockStateDto {
+
+    @JsonIgnore
+    private BlockDto block;
 
     private int id;
 
@@ -20,6 +25,14 @@ public class BlockStateDto {
     public BlockStateDto(int id, boolean def) {
         this.id = id;
         this.def = def;
+    }
+
+    public BlockDto getBlock() {
+        return block;
+    }
+
+    public void setBlock(BlockDto block) {
+        this.block = block;
     }
 
     public int getId() {
@@ -44,6 +57,11 @@ public class BlockStateDto {
 
     public void setProperties(Map<String, String> properties) {
         this.properties = properties;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.build(this).deepArray(true).parents(true).reflective(true).simpleName(true).toString();
     }
 
 }

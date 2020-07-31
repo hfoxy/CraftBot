@@ -3,7 +3,11 @@ package me.hfox.craftbot.world.impl;
 import me.hfox.craftbot.connection.client.Client;
 import me.hfox.craftbot.entity.Entity;
 import me.hfox.craftbot.entity.living.Player;
+import me.hfox.craftbot.exception.world.BotChunkNotLoadedException;
+import me.hfox.craftbot.world.Chunk;
+import me.hfox.craftbot.world.Location;
 import me.hfox.craftbot.world.World;
+import me.hfox.craftbot.world.palette.BlockStateDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,10 +24,13 @@ public class CraftWorld implements World {
     private final Object playersLock = new Object();
     private final Set<Player> players;
 
+    private final Map<Integer, Map<Integer, Chunk>> chunks;
+
     public CraftWorld(Client client) {
         this.client = client;
         this.entities = new ConcurrentHashMap<>();
         this.players = new HashSet<>();
+        this.chunks = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -79,6 +86,50 @@ public class CraftWorld implements World {
         }
 
         return list;
+    }
+
+    @Override
+    public Optional<Chunk> getChunk(int chunkX, int chunkZ) {
+        Map<Integer, Chunk> xChunks = chunks.get(chunkX);
+        if (xChunks == null) {
+            return Optional.empty();
+        }
+
+        return Optional.ofNullable(xChunks.get(chunkZ));
+    }
+
+    @Override
+    public Optional<Chunk> getChunkByLocation(Location location) {
+        return getChunk(location.getChunkX(), location.getChunkZ());
+    }
+
+    @Override
+    public void loadChunk(int chunkX, int chunkZ) {
+        chunks.computeIfAbsent(chunkX, (k) -> new ConcurrentHashMap<>()).put(chunkZ, new CraftChunk(chunkX, chunkZ));
+    }
+
+    @Override
+    public void unloadChunk(int chunkX, int chunkZ) {
+        Map<Integer, Chunk> xChunks = chunks.get(chunkX);
+        if (xChunks != null) {
+            xChunks.remove(chunkZ);
+        }
+    }
+
+    private Chunk getChunk(Location location) {
+        return getChunkByLocation(location).orElseThrow(
+                () -> new BotChunkNotLoadedException("Chunk[x=" + location.getChunkX() + ", z=" + location.getChunkZ() + "] - Location[x=" + location.getX() + "/blockX=" + location.getBlockX() + ", z=" + location.getZ() + "/blockZ=" + location.getBlockZ() + "]")
+        );
+    }
+
+    @Override
+    public BlockStateDto getBlock(Location location) {
+        return getChunk(location).getBlockAt(location);
+    }
+
+    @Override
+    public void setBlock(Location location, BlockStateDto blockState) {
+        getChunk(location).setBlockAt(location, blockState);
     }
 
 }
