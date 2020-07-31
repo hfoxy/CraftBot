@@ -7,6 +7,9 @@ import me.hfox.craftbot.entity.EntityRegistration;
 import me.hfox.craftbot.entity.data.PlayerInfo;
 import me.hfox.craftbot.entity.data.creation.PlayerCreationData;
 import me.hfox.craftbot.entity.living.ClientPlayer;
+import me.hfox.craftbot.pathing.AStar;
+import me.hfox.craftbot.pathing.PathingResult;
+import me.hfox.craftbot.pathing.Tile;
 import me.hfox.craftbot.protocol.ClientPacket;
 import me.hfox.craftbot.protocol.ServerPacket;
 import me.hfox.craftbot.protocol.play.server.*;
@@ -16,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Executors;
@@ -38,6 +42,9 @@ public class ClientHandler {
 
     private ClientPlayer player;
     private Future<?> tickTask;
+
+    private Location startLocation;
+    private List<Tile> tiles;
 
     public ClientHandler(Client client) {
         this.client = client;
@@ -97,6 +104,32 @@ public class ClientHandler {
         }
 
         worldHandler.onReceive(packet);
+    }
+
+    public Location getStartLocation() {
+        return startLocation;
+    }
+
+    public List<Tile> getTiles() {
+        return tiles;
+    }
+
+    public PathingResult path(Location end, int range) throws AStar.InvalidPathException {
+        Location start = getPlayer().getLocation().minus(0, 1, 0);
+        AStar path = new AStar(getWorldHandler().getWorld(), start, end, range);
+
+        List<Tile> route = path.iterate();
+        if (path.getPathingResult() == PathingResult.SUCCESS) {
+            startLocation = start;
+            tiles = route;
+        }
+
+        return path.getPathingResult();
+    }
+
+    public void finishedPathing() {
+        startLocation = null;
+        tiles = null;
     }
 
 }

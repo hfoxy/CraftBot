@@ -271,13 +271,14 @@ public class AStar {
 			return blockState.getProperties().get("open").equals("true");
 		}
 
-		return canBlockBeWalkedThrough(
-				w.getBlock(l.plus(0, 1, 0)).getBlock().getIdentifier()
-		) && canBlockBeWalkedThrough(
-				w.getBlock(l.plus(0, 2, 0))
-						.getBlock()
-						.getIdentifier()
-		);
+		Location up1 = l.plus(0, 1, 0);
+		BlockStateDto blockUp1 = w.getBlock(up1);
+		Location up2 = l.plus(0, 2, 0);
+		BlockStateDto blockUp2 = w.getBlock(up2);
+
+		LOGGER.debug("Block at {} is {}", up1, blockUp1.getBlock().getIdentifier());
+		LOGGER.debug("Block at {} is {}", up2, blockUp2.getBlock().getIdentifier());
+		return canBlockBeWalkedThrough(blockUp1.getBlock().getIdentifier()) && canBlockBeWalkedThrough(blockUp2.getBlock().getIdentifier());
 	}
 
 	private boolean canBlockBeWalkedThrough(String identifier) {

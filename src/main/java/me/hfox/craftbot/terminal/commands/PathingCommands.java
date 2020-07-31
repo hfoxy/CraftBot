@@ -1,6 +1,7 @@
 package me.hfox.craftbot.terminal.commands;
 
 import me.hfox.craftbot.pathing.AStar;
+import me.hfox.craftbot.pathing.PathingResult;
 import me.hfox.craftbot.pathing.Tile;
 import me.hfox.aphelion.command.CommandContext;
 import me.hfox.aphelion.command.annotations.Command;
@@ -39,18 +40,12 @@ public class PathingCommands {
                 throw new CommandUsageException();
             } else {
                 end = new Location(args.getInteger(0), args.getInteger(1), args.getInteger(2));
+                LOGGER.info("End location is {}", end);
             }
         }
 
-        World world = WORLD_HANDLER.getWorld();
-        ClientPlayer clientPlayer = WORLD_HANDLER.getClientHandler().getPlayer();
-        Location start = clientPlayer.getLocation().minus(0, 1, 0);
-
-        AStar path = new AStar(world, start, end, 50);
-        List<Tile> route = path.iterate();
-        sender.sendMessage("Result: " + path.getPathingResult());
-
-        LOGGER.info("Path result: {}", route);
+        PathingResult result = WORLD_HANDLER.getClientHandler().path(end, 100);
+        sender.sendMessage("Result: " + result);
     }
 
     @Command(aliases = {"connect"}, description = "Connect to a server", usage = "[host{:port}]", min = 1, max = 1)

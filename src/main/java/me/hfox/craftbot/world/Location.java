@@ -84,7 +84,7 @@ public class Location {
 
     public void setBlockX(int blockX) {
         this.blockX = blockX;
-        this.x = blockX - 0.5D;
+        this.x = blockX + 0.5D;
     }
 
     public int getChunkX() {
@@ -135,8 +135,16 @@ public class Location {
         return new Location(getX() + x, getY() + y, getZ() + z);
     }
 
+    public Location plus(int x, int y, int z) {
+        return new Location(getBlockX() + x, getBlockY() + y, getBlockZ() + z);
+    }
+
     public Location minus(double x, double y, double z) {
         return new Location(getX() - x, getY() - y, getZ() - z);
+    }
+
+    public Location minus(int x, int y, int z) {
+        return new Location(getBlockX() - x, getBlockY() - y, getBlockZ() - z);
     }
 
     public Location copy() {
