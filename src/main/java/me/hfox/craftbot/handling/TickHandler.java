@@ -91,7 +91,7 @@ public class TickHandler implements Runnable {
                         if (yDiff > 0) {
                             yDiff = Math.sqrt(1 - Math.pow(yDiff - 1, 6)) + 0.1;
                         } else if (yDiff < 0) {
-                            yDiff = -Math.sqrt(1 - Math.pow(Math.abs(yDiff), 6)) + 0.1;
+                            yDiff = -Math.sqrt(1 - Math.pow(Math.abs(yDiff), 8)) + 0.1;
                         }
 
                         // Location newLoc = new Location(xDiff, yDiff, zDiff, currentLocation.getYaw(), currentLocation.getPitch());
