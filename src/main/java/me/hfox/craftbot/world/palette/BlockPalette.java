@@ -19,6 +19,8 @@ public class BlockPalette {
 
     private static final Map<Integer, BlockStateDto> BLOCK_STATES = new HashMap<>();
 
+    private static int AIR_ID;
+
     public static void load() throws IOException {
         LOGGER.info("Parsing palette file");
         InputStream paletteInput;
@@ -44,6 +46,10 @@ public class BlockPalette {
                 if (old != null) {
                     throw new BotUnknownBlockException("Block ID " + state.getId() + " already exists");
                 }
+
+                if (entry.getKey().equals("minecraft:air")) {
+                    AIR_ID = state.getId();
+                }
             }
 
             states.addAll(block.getStates());
@@ -54,6 +60,10 @@ public class BlockPalette {
 
     public static Optional<BlockStateDto> findById(int blockId) {
         return Optional.ofNullable(BLOCK_STATES.get(blockId));
+    }
+
+    public static BlockStateDto getAir() {
+        return findById(AIR_ID).orElse(null);
     }
 
 }

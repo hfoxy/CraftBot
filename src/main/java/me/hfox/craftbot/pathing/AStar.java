@@ -261,17 +261,23 @@ public class AStar {
 
 		for (String block : DISALLOWED_WALKABLE) {
 			if (identifier.contains(block)) {
-				LOGGER.info("Block is not walkable: {}", identifier);
+				LOGGER.debug("Block is not walkable: {}", identifier);
 				return false;
 			}
 		}
 
 		if (identifier.contains("fence_gate") || identifier.contains("door")) {
-			LOGGER.info("Gate/door: {}", blockState.getProperties().get("open"));
+			LOGGER.debug("Gate/door: {}", blockState.getProperties().get("open"));
 			return blockState.getProperties().get("open").equals("true");
 		}
 
-		return canBlockBeWalkedThrough(w.getBlock(l.plus(0, 1, 0)).getBlock().getIdentifier()) && canBlockBeWalkedThrough(w.getBlock(l.plus(0, 2, 0)).getBlock().getIdentifier());
+		return canBlockBeWalkedThrough(
+				w.getBlock(l.plus(0, 1, 0)).getBlock().getIdentifier()
+		) && canBlockBeWalkedThrough(
+				w.getBlock(l.plus(0, 2, 0))
+						.getBlock()
+						.getIdentifier()
+		);
 	}
 
 	private boolean canBlockBeWalkedThrough(String identifier) {
@@ -281,12 +287,12 @@ public class AStar {
 			}
 		}
 
-		LOGGER.info("Not allowed through block: {}", identifier);
+		LOGGER.debug("Not allowed through block: {}", identifier);
 		return false;
 	}
 
 	@SuppressWarnings("serial")
-	public class InvalidPathException extends Exception {
+	public static class InvalidPathException extends Exception {
 
 		private final boolean s, e;
 
