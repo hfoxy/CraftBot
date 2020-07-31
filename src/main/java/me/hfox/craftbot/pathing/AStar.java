@@ -9,13 +9,17 @@ import me.hfox.craftbot.world.Location;
 import me.hfox.craftbot.world.World;
 import me.hfox.craftbot.world.palette.BlockDto;
 import me.hfox.craftbot.world.palette.BlockStateDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 public class AStar {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(AStar.class);
+
 	private static List<String> DISALLOWED_WALKABLE = Lists.newArrayList("air", "lava", "fire", "wheat", "ladder", "fence");
-	private static List<String> DISALLOWED_THROUGH = Lists.newArrayList("air", "lava", "fire", "wheat");
+	private static List<String> ALLOWED_THROUGH = Lists.newArrayList("air", "door", "fence_gate");
 
 	private final int sx, sy, sz, ex, ey, ez;
 	private final World w;
@@ -48,11 +52,11 @@ public class AStar {
 
 		boolean s = true, e = true;
 
+		this.w = world;
 		if (!(s = this.isLocationWalkable(start)) || !(e = this.isLocationWalkable(end))) {
 			throw new InvalidPathException(s, e);
 		}
 
-		this.w = world;
 		this.sx = start.getBlockX();
 		this.sy = start.getBlockY();
 		this.sz = start.getBlockZ();
@@ -257,11 +261,13 @@ public class AStar {
 
 		for (String block : DISALLOWED_WALKABLE) {
 			if (identifier.contains(block)) {
+				LOGGER.info("Block is not walkable: {}", identifier);
 				return false;
 			}
 		}
 
 		if (identifier.contains("fence_gate") || identifier.contains("door")) {
+			LOGGER.info("Gate/door: {}", blockState.getProperties().get("open"));
 			return blockState.getProperties().get("open").equals("true");
 		}
 
@@ -269,13 +275,14 @@ public class AStar {
 	}
 
 	private boolean canBlockBeWalkedThrough(String identifier) {
-		for (String blk : DISALLOWED_THROUGH) {
+		for (String blk : ALLOWED_THROUGH) {
 			if (identifier.contains(blk)) {
-				return false;
+				return true;
 			}
 		}
 
-		return true;
+		LOGGER.info("Not allowed through block: {}", identifier);
+		return false;
 	}
 
 	@SuppressWarnings("serial")

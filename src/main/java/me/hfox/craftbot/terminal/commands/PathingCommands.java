@@ -44,7 +44,7 @@ public class PathingCommands {
 
         World world = WORLD_HANDLER.getWorld();
         ClientPlayer clientPlayer = WORLD_HANDLER.getClientHandler().getPlayer();
-        Location start = clientPlayer.getLocation();
+        Location start = clientPlayer.getLocation().minus(0, 1, 0);
 
         AStar path = new AStar(world, start, end, 50);
         List<Tile> route = path.iterate();

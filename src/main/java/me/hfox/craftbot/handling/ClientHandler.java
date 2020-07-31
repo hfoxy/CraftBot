@@ -10,6 +10,7 @@ import me.hfox.craftbot.entity.living.ClientPlayer;
 import me.hfox.craftbot.protocol.ClientPacket;
 import me.hfox.craftbot.protocol.ServerPacket;
 import me.hfox.craftbot.protocol.play.server.*;
+import me.hfox.craftbot.world.Location;
 import me.hfox.craftbot.world.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +87,13 @@ public class ClientHandler {
             player = EntityRegistration.createClientPlayer(new PlayerCreationData(
                     world, joinGame.getEntityId(), client.getUniqueId(), playerInfo.get(client.getUniqueId())
             ));
+
             LOGGER.info("Joined game");
+        } else if (packet instanceof PacketServerPlayPlayerPositionAndLook) {
+            PacketServerPlayPlayerPositionAndLook positionAndLook = (PacketServerPlayPlayerPositionAndLook) packet;
+
+            Location newLoc = new Location(positionAndLook.getX(), positionAndLook.getY(), positionAndLook.getZ(), positionAndLook.getYaw(), positionAndLook.getPitch());
+            player.setLocation(newLoc);
         }
 
         worldHandler.onReceive(packet);
