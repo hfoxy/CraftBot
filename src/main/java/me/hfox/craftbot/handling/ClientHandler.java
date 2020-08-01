@@ -78,7 +78,7 @@ public class ClientHandler {
             }
 
             tickHandler.run();
-        }, 0, 50, TimeUnit.MILLISECONDS);
+        }, 50L, 50L, TimeUnit.MILLISECONDS);
     }
 
     public void stop() {
@@ -105,6 +105,8 @@ public class ClientHandler {
 
             Location newLoc = new Location(positionAndLook.getX(), positionAndLook.getY(), positionAndLook.getZ(), positionAndLook.getYaw(), positionAndLook.getPitch());
             player.setLocation(newLoc);
+        } else if (packet instanceof PacketServerPlayDisconnect) {
+            stop();
         }
 
         worldHandler.onReceive(packet);
