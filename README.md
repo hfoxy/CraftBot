@@ -2,3 +2,11 @@ CraftBot ![Java CI with Maven](https://github.com/hfoxy/CraftBot/workflows/Java%
 ========
 
 Minecraft bot for 1.15.2
+
+## Todos
+- [ ] API for Pathing that makes more sense
+- [ ] Allow multiple clients
+- [ ] Authentication
+- [ ] Improved navigation around the API
+   - [ ] Remove public constants such as `PathCommands.WORLD_HANDLER`
+   - [ ] Ability to get to Bot via `Bot#getBot()`, `Bot#getBots()`, `Bot#findByUuid(UUID)`
