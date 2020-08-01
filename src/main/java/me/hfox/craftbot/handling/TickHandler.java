@@ -8,6 +8,8 @@ import me.hfox.craftbot.protocol.play.client.PacketClientPlayPlayerMovement;
 import me.hfox.craftbot.protocol.play.client.PacketClientPlayPlayerPosition;
 import me.hfox.craftbot.protocol.play.client.PacketClientPlayPlayerPositionAndRotation;
 import me.hfox.craftbot.world.Location;
+import me.hfox.craftbot.world.palette.BlockDto;
+import me.hfox.craftbot.world.palette.BlockStateDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -133,7 +135,8 @@ public class TickHandler implements Runnable {
                         Float pitch = null;
 
                         Tile tile = tiles.get(0);
-                        Location nextTile = clientHandler.getStartLocation().plus(tile.getX(), tile.getY(), tile.getZ()).plus(0, 1.0, 0);
+                        Location tileLoc = clientHandler.getStartLocation().plus(tile.getX(), tile.getY(), tile.getZ());
+                        Location nextTile = tileLoc.plus(0, 1.0, 0);
                         if (tiles.size() > 2) {
                             Tile followingTile = tiles.get(0);
 
@@ -200,7 +203,7 @@ public class TickHandler implements Runnable {
 
                         // LOGGER.info("Current Location: {}", currentLocation);
                         // LOGGER.info("Next Tile: {}", nextTile);
-                        // LOGGER.info("Next Location: y={}", String.format("%.2f", newLoc.getY()));
+                        LOGGER.info("Next Location: x={},y={},z={}", String.format("%.2f", newLoc.getX()), String.format("%.2f", newLoc.getY()), String.format("%.2f", newLoc.getZ()));
 
                         clientHandler.getPlayer().setLocation(newLoc);
                         clientHandler.getClient().getConnection().writePacket(new PacketClientPlayPlayerPositionAndRotation(newLoc.getX(), newLoc.getY(), newLoc.getZ(), newLoc.getYaw(), newLoc.getPitch(), grounded));

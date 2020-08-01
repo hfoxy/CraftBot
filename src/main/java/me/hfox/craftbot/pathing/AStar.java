@@ -18,8 +18,10 @@ public class AStar {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AStar.class);
 
+	private static List<String> ALLOWED_WALKABLE = Lists.newArrayList("stair");
 	private static List<String> DISALLOWED_WALKABLE = Lists.newArrayList("air", "lava", "fire", "wheat", "ladder", "fence");
-	private static List<String> ALLOWED_THROUGH = Lists.newArrayList("air", "door", "fence_gate");
+	private static List<String> ALLOWED_THROUGH = Lists.newArrayList("air", "door", "fence_gate", "nether_portal", "end_portal", "grass");
+	private static List<String> NOT_ALLOWED_THROUGH = Lists.newArrayList("end_portal_frame", "block", "stair");
 
 	private final int sx, sy, sz, ex, ey, ez;
 	private final World w;
@@ -259,10 +261,20 @@ public class AStar {
 		BlockDto blockInfo = blockState.getBlock();
 		String identifier = blockInfo.getIdentifier();
 
-		for (String block : DISALLOWED_WALKABLE) {
+		boolean ignoredDisallowed = false;
+		for (String block : ALLOWED_WALKABLE) {
 			if (identifier.contains(block)) {
-				LOGGER.debug("Block is not walkable: {}", identifier);
-				return false;
+				ignoredDisallowed = true;
+				break;
+			}
+		}
+
+		if (!ignoredDisallowed) {
+			for (String block : DISALLOWED_WALKABLE) {
+				if (identifier.contains(block)) {
+					LOGGER.debug("Block is not walkable: {}", identifier);
+					return false;
+				}
 			}
 		}
 
@@ -282,8 +294,22 @@ public class AStar {
 	}
 
 	private boolean canBlockBeWalkedThrough(String identifier) {
+		if (identifier.equalsIgnoreCase("minecraft:oak_stairs")) {
+			LOGGER.info("Checking if oak_stairs can be walked through");
+		}
+
+		for (String blk : NOT_ALLOWED_THROUGH) {
+			if (identifier.contains(blk)) {
+				return false;
+			}
+		}
+
 		for (String blk : ALLOWED_THROUGH) {
 			if (identifier.contains(blk)) {
+				if (identifier.equalsIgnoreCase("minecraft:oak_stairs")) {
+					LOGGER.info("yes they can!");
+				}
+
 				return true;
 			}
 		}

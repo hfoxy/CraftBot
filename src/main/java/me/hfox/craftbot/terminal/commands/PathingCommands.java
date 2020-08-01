@@ -49,7 +49,7 @@ public class PathingCommands {
             }
         }
 
-        PathingResult result = WORLD_HANDLER.getClientHandler().path(end, 100);
+        PathingResult result = WORLD_HANDLER.getClientHandler().path(end, 200);
         sender.sendMessage("Result: " + result);
     }
 
