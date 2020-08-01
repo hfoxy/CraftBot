@@ -3,6 +3,7 @@ package me.hfox.craftbot.entity;
 import me.hfox.craftbot.entity.data.creation.EntityCreationData;
 import me.hfox.craftbot.entity.data.creation.PlayerCreationData;
 import me.hfox.craftbot.entity.data.creation.PlayerEntityType;
+import me.hfox.craftbot.entity.living.ClientPlayer;
 import me.hfox.craftbot.entity.living.Player;
 import me.hfox.craftbot.exception.entity.BotUnsupportedEntityException;
 
@@ -20,6 +21,10 @@ public class EntityRegistration {
 
     public static Player createPlayer(PlayerCreationData data) {
         return (Player) createEntity(Entities.PLAYER.getTypeId(), data);
+    }
+
+    public static ClientPlayer createClientPlayer(PlayerCreationData data) {
+        return (ClientPlayer) createEntity(Entities.CLIENT_PLAYER.getTypeId(), data);
     }
 
     public static Entity createEntity(int typeId, EntityCreationData data) {

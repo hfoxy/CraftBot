@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import me.hfox.craftbot.exception.world.BotUnknownBlockException;
 import me.hfox.craftbot.world.Chunk;
 import me.hfox.craftbot.world.Location;
+import me.hfox.craftbot.world.palette.BlockPalette;
 import me.hfox.craftbot.world.palette.BlockStateDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +69,13 @@ public class CraftChunk implements Chunk {
         }
 
         // LOGGER.info("blocks... {} -{}", blocks, "done");
-        return blocks[location.getChunkBlockX()][location.getBlockY()][location.getChunkBlockZ()];
+
+        BlockStateDto state = blocks[location.getChunkBlockX()][location.getBlockY()][location.getChunkBlockZ()];
+        if (state != null) {
+            return state;
+        }
+
+        return BlockPalette.getAir();
     }
 
     @Override
