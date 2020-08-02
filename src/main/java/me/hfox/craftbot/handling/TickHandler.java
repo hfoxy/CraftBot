@@ -38,11 +38,22 @@ public class TickHandler implements Runnable {
     private double[] zPositiveDiffLookup;
     private double[] zNegativeDiffLookup;
 
+    private boolean sprinting;
+
     public TickHandler(ClientHandler clientHandler) {
         this.clientHandler = clientHandler;
         this.tickCounter = new AtomicInteger();
 
         recalculateDiffLookupTables();
+    }
+
+    public void setSprinting(boolean sprinting) {
+        boolean updated = this.sprinting != sprinting;
+        this.sprinting = sprinting;
+
+        if (updated) {
+            recalculateDiffLookupTables();
+        }
     }
 
     public void recalculateDiffLookupTables() {
@@ -203,7 +214,7 @@ public class TickHandler implements Runnable {
 
                         // LOGGER.info("Current Location: {}", currentLocation);
                         // LOGGER.info("Next Tile: {}", nextTile);
-                        LOGGER.info("Next Location: x={},y={},z={}", String.format("%.2f", newLoc.getX()), String.format("%.2f", newLoc.getY()), String.format("%.2f", newLoc.getZ()));
+                        LOGGER.debug("Next Location: x={},y={},z={}", String.format("%.2f", newLoc.getX()), String.format("%.2f", newLoc.getY()), String.format("%.2f", newLoc.getZ()));
 
                         clientHandler.getPlayer().setLocation(newLoc);
                         clientHandler.getClient().getConnection().writePacket(new PacketClientPlayPlayerPositionAndRotation(newLoc.getX(), newLoc.getY(), newLoc.getZ(), newLoc.getYaw(), newLoc.getPitch(), grounded));
@@ -218,20 +229,21 @@ public class TickHandler implements Runnable {
             } else {
                 first = true;
                 clientHandler.getClient().getConnection().writePacket(new PacketClientPlayPlayerMovement(true));
+                clientHandler.getPlayer().setSprinting(false);
             }
 
             savedMissing = new HashSet<>(EntityRegistration.MISSING_ENTITIES);
         } catch (Throwable ex) {
-            LOGGER.error("BROKEN", ex);
+            LOGGER.error("Unable to handle tick", ex);
         }
     }
 
-    public static int getTicksPerTile() {
+    public int getTicksPerTile() {
         //return 6;
-        return 6;
+        return sprinting ? 4 : 6;
     }
 
-    public static int getTicksPerHalfTile() {
+    public int getTicksPerHalfTile() {
         return getTicksPerTile() / 2;
     }
 

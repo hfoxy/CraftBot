@@ -26,31 +26,42 @@ public class PathingCommands {
 
     public static WorldHandler WORLD_HANDLER;
 
+    @Command(aliases = {"toggle-sprint", "sprint"}, description = "Toggles sprinting", max = 0)
+    public static void toggleSprint(CommandSender sender, CommandContext<CommandSender> args) throws CommandException, InterruptedException, AStar.InvalidPathException {
+        ClientPlayer player = WORLD_HANDLER.getClientHandler().getPlayer();
+        player.setSprinting(!player.isSprinting());
+
+        sender.sendMessage("Player is {} sprinting ({})", player.isSprinting() ? "now" : "no longer", player.isSprinting());
+    }
+
     @Command(aliases = {"path-recalculate", "p-rc"}, description = "Recalculate path lookup table", max = 0)
     public static void pathRecalculate(CommandSender sender, CommandContext<CommandSender> args) throws CommandException, InterruptedException, AStar.InvalidPathException {
         WORLD_HANDLER.getClientHandler().getTickHandler().recalculateDiffLookupTables();
     }
 
-    @Command(aliases = {"path"}, description = "Find a path", max = 3)
+    @Command(aliases = {"path"}, description = "Find a path", usage = "[x] [y] [z] {sprinting}", max = 4)
     public static void path(CommandSender sender, CommandContext<CommandSender> args) throws CommandException, InterruptedException, AStar.InvalidPathException {
         if (WORLD_HANDLER == null) {
             sender.sendMessage(Level.ERROR, "Unable to path, no WorldHandler");
             return;
         }
 
-        // -239 104 141
-        Location end = new Location(-239, 104, 141);
-        if (args.length() > 0) {
-            if (args.length() != 3) {
-                throw new CommandUsageException();
-            } else {
-                end = new Location(args.getInteger(0), args.getInteger(1), args.getInteger(2));
-                LOGGER.info("End location is {}", end);
-            }
+        boolean sprint;
+        Location end;
+        if (args.length() < 3) {
+            throw new CommandUsageException();
+        } else {
+            end = new Location(args.getInteger(0), args.getInteger(1), args.getInteger(2));
+            LOGGER.info("End location is {}", end);
+            sprint = args.getBoolean(3, false);
         }
 
-        PathingResult result = WORLD_HANDLER.getClientHandler().path(end, 200);
+        PathingResult result = WORLD_HANDLER.getClientHandler().path(end, 500);
         sender.sendMessage("Result: " + result);
+
+        if (result == PathingResult.SUCCESS) {
+            WORLD_HANDLER.getClientHandler().getPlayer().setSprinting(sprint);
+        }
     }
 
 }

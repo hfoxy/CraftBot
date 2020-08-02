@@ -12,7 +12,9 @@ import me.hfox.craftbot.pathing.PathingResult;
 import me.hfox.craftbot.pathing.Tile;
 import me.hfox.craftbot.protocol.ClientPacket;
 import me.hfox.craftbot.protocol.ServerPacket;
+import me.hfox.craftbot.protocol.play.client.PacketClientPlayEntityAction;
 import me.hfox.craftbot.protocol.play.server.*;
+import me.hfox.craftbot.protocol.play.server.data.entity.EntityAction;
 import me.hfox.craftbot.world.Location;
 import me.hfox.craftbot.world.World;
 import org.slf4j.Logger;
@@ -86,7 +88,12 @@ public class ClientHandler {
     }
 
     public void onSend(ClientPacket packet) {
-        //
+        if (packet instanceof PacketClientPlayEntityAction) {
+            PacketClientPlayEntityAction entityAction = (PacketClientPlayEntityAction) packet;
+            if (entityAction.getAction() == EntityAction.START_SPRINTING || entityAction.getAction() == EntityAction.STOP_SPRINTING) {
+                tickHandler.setSprinting(entityAction.getAction() == EntityAction.START_SPRINTING);
+            }
+        }
     }
 
     public void onReceive(ServerPacket packet) {

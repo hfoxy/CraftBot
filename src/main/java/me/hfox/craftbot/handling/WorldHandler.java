@@ -73,12 +73,12 @@ public class WorldHandler {
             List<Entity> removed = world.removeEntitiesById(((PacketServerPlayDestroyEntities) packet).getEntityIds());
             LOGGER.debug("Removed {} entities", removed);
 
-            for (Entity rem : removed) {
+            /*for (Entity rem : removed) {
                 if (rem instanceof Player) {
                     Player p = (Player) rem;
                     clientHandler.getClient().getConnection().writePacket(new PacketClientPlayChatMessage("Bye " + p.getName()));
                 }
-            }
+            }*/
         } else if (packet instanceof PacketServerPlayEntityMetadata) {
             PacketServerPlayEntityMetadata entityMetadata = (PacketServerPlayEntityMetadata) packet;
 

@@ -28,8 +28,8 @@ public class AStar {
 
 	private PathingResult result;
 
-	private HashMap<String, Tile> open = new HashMap<String, Tile>();
-	private HashMap<String, Tile> closed = new HashMap<String, Tile>();
+	private HashMap<String, Tile> open = new HashMap<>();
+	private HashMap<String, Tile> closed = new HashMap<>();
 
 	private void addToOpenList(Tile t, boolean modify) {
 		if (open.containsKey(t.getUID())) {
@@ -50,6 +50,9 @@ public class AStar {
 	private final int range;
 	private final String endUID;
 
+	private final Location start;
+	private final Location end;
+
 	public AStar(World world, Location start, Location end, int range) throws InvalidPathException {
 
 		boolean s = true, e = true;
@@ -58,6 +61,9 @@ public class AStar {
 		if (!(s = this.isLocationWalkable(start)) || !(e = this.isLocationWalkable(end))) {
 			throw new InvalidPathException(s, e);
 		}
+
+		this.start = start;
+		this.end = end;
 
 		this.sx = start.getBlockX();
 		this.sy = start.getBlockY();
@@ -203,9 +209,25 @@ public class AStar {
 						continue;
 					}
 
+					// stop trying to cut corners when they can't be cut
+					int absX = Math.abs(x);
+					int absZ = Math.abs(z);
+					if (absX == 1 && absZ == 1) {
+						Location cutX = start.plus(current.getX(), current.getY(), current.getZ()).plus(0, y, z);
+						Location cutZ = start.plus(current.getX(), current.getY(), current.getZ()).plus(x, y, 0);
+
+						if (!isLocationWalkable(cutX)) {
+							LOGGER.debug("unable to cut X corner @ x={}, y={}, z={}", cutX.getBlockX(), cutX.getBlockY(), cutX.getBlockZ());
+							continue;
+						} else if (!isLocationWalkable(cutZ)) {
+							LOGGER.debug("unable to cut Z corner @ x={}, y={}, z={}", cutZ.getBlockX(), cutZ.getBlockY(), cutZ.getBlockZ());
+							continue;
+						}
+					}
+
 					if (x != 0 && z != 0 && (y == 0 || y == 1)) {
 						// check to stop jumping through diagonal blocks
-						Tile xOff = new Tile((short) (current.getX() + x), (short) (current.getY() + y), (short) (current.getZ()), current), zOff = new Tile((short) (current.getX()),
+						Tile xOff = new Tile((short) (current.getX() + x), (short) (current.getY() + y), current.getZ(), current), zOff = new Tile(current.getX(),
 								(short) (current.getY() + y), (short) (current.getZ() + z), current);
 						if (!this.isTileWalkable(xOff) && !this.isTileWalkable(zOff)) {
 							continue;
