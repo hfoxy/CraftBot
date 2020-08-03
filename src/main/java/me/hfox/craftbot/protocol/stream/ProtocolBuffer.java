@@ -401,6 +401,11 @@ public class ProtocolBuffer extends NestedBuffer {
         return Pose.values()[readVarInt()];
     }
 
+    public void writeByteArray(byte[] data) {
+        writeVarInt(data.length);
+        writeBytes(data);
+    }
+
     public byte[] readByteArray() {
         byte[] data = new byte[readVarInt()];
         readBytes(data);

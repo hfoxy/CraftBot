@@ -1,6 +1,7 @@
 package me.hfox.craftbot.connection.client;
 
 import me.hfox.craftbot.connection.Connection;
+import me.hfox.craftbot.connection.client.session.Session;
 import me.hfox.craftbot.entity.data.PlayerInfo;
 import me.hfox.craftbot.exception.connection.BotConnectionException;
 import me.hfox.craftbot.protocol.ClientPacket;
@@ -18,6 +19,8 @@ public interface Client {
     void connect(String host, int port) throws BotConnectionException;
 
     Connection getConnection();
+
+    Session getSession();
 
     UUID getUniqueId();
 

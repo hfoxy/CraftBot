@@ -129,7 +129,14 @@ public class ClientHandler {
 
     public PathingResult path(Location end, int range) throws AStar.InvalidPathException {
         Location start = getPlayer().getLocation().minus(0, 1, 0);
-        AStar path = new AStar(getWorldHandler().getWorld(), start, end, range);
+        AStar path;
+
+        try {
+            path = new AStar(getWorldHandler().getWorld(), start, end, range);
+        } catch (AStar.InvalidPathException ex) {
+            LOGGER.error("Unable to path: {}", ex.getErrorReason());
+            return PathingResult.ERROR;
+        }
 
         List<Tile> route = path.iterate();
         if (path.getPathingResult() == PathingResult.SUCCESS) {

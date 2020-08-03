@@ -6,11 +6,14 @@ import me.hfox.craftbot.connection.client.Client;
 import me.hfox.craftbot.connection.compression.Compression;
 import me.hfox.craftbot.connection.compression.CompressionImpl;
 import me.hfox.craftbot.entity.data.Hand;
+import me.hfox.craftbot.exception.connection.BotEncryptionException;
+import me.hfox.craftbot.exception.session.BotAuthenticationFailedException;
 import me.hfox.craftbot.protocol.ClientPacket;
 import me.hfox.craftbot.protocol.Protocol;
 import me.hfox.craftbot.protocol.ServerPacket;
 import me.hfox.craftbot.protocol.handshake.client.PacketClientHandshake;
 import me.hfox.craftbot.protocol.handshake.client.ProtocolState;
+import me.hfox.craftbot.protocol.login.client.PacketClientLoginEncryptionResponse;
 import me.hfox.craftbot.protocol.login.server.PacketServerLoginDisconnect;
 import me.hfox.craftbot.protocol.login.server.PacketServerLoginEncryptionRequest;
 import me.hfox.craftbot.protocol.login.server.PacketServerLoginSetCompression;
@@ -26,9 +29,18 @@ import me.hfox.craftbot.protocol.status.client.PacketClientStatusPing;
 import me.hfox.craftbot.protocol.status.server.PacketServerStatusPong;
 import me.hfox.craftbot.protocol.status.server.PacketServerStatusResponse;
 import me.hfox.craftbot.protocol.status.server.data.ServerListPingResponse;
+import me.hfox.craftbot.utils.CryptoUtils;
 import me.hfox.craftbot.world.Location;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.crypto.SecretKey;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 
 public class ServerConnection implements Connection {
 
@@ -116,9 +128,30 @@ public class ServerConnection implements Connection {
             PacketServerLoginEncryptionRequest request = (PacketServerLoginEncryptionRequest) packet;
 
             LOGGER.info("Encryption requested!");
-            LOGGER.info("serverId: {}", request.getServerId());
-            LOGGER.info("publicKey: {}", request.getPublicKey());
-            LOGGER.info("verifyToken: {}", request.getVerifyToken());
+
+            try {
+                SecretKey secretKey = CryptoUtils.generateSecretKey();
+                LOGGER.info("Generated secret key");
+                PublicKey publicKey = CryptoUtils.decodePublicKey(request.getPublicKey());
+                LOGGER.info("Decoded public key");
+
+                String hash = CryptoUtils.getServerIdHash(request.getServerId(), publicKey, secretKey);
+                LOGGER.info("Generated server id hash: {}", hash);
+
+                client.getSession().joinServer(hash);
+                LOGGER.info("Joined server!");
+
+                writePacket(new PacketClientLoginEncryptionResponse(secretKey.getEncoded(), request.getVerifyToken()));
+            } catch (BotEncryptionException ex) {
+                LOGGER.error("Unable to encrypt", ex);
+                disconnect();
+            } catch (BotAuthenticationFailedException ex) {
+                LOGGER.error("Unable to authenticate", ex);
+                disconnect();
+            } catch (Exception ex) {
+                LOGGER.error("Unexpected scenario", ex);
+                disconnect();
+            }
         } else if (packet instanceof PacketServerLoginSuccess) {
             LOGGER.info("Login success!");
             protocol.setState(ProtocolState.PLAY);

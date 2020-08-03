@@ -3,7 +3,8 @@ package me.hfox.craftbot.pathing;
 public enum PathingResult {
 	
 	SUCCESS(0),
-	NO_PATH(-1);
+	NO_PATH(-1),
+	ERROR(-2);
 
 	private final int ec;
 	

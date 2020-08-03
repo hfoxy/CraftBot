@@ -56,7 +56,7 @@ public class PathingCommands {
             sprint = args.getBoolean(3, false);
         }
 
-        PathingResult result = WORLD_HANDLER.getClientHandler().path(end, 500);
+        PathingResult result = WORLD_HANDLER.getClientHandler().path(end, 300);
         sender.sendMessage("Result: " + result);
 
         if (result == PathingResult.SUCCESS) {

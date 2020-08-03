@@ -5,6 +5,7 @@ import me.hfox.craftbot.exception.protocol.BotPacketDecodingException;
 import me.hfox.craftbot.exception.protocol.BotProtocolException;
 import me.hfox.craftbot.protocol.handshake.client.PacketClientHandshake;
 import me.hfox.craftbot.protocol.handshake.client.ProtocolState;
+import me.hfox.craftbot.protocol.login.client.PacketClientLoginEncryptionResponse;
 import me.hfox.craftbot.protocol.login.client.PacketClientLoginStart;
 import me.hfox.craftbot.protocol.login.server.PacketServerLoginDisconnect;
 import me.hfox.craftbot.protocol.login.server.PacketServerLoginEncryptionRequest;
@@ -55,6 +56,7 @@ public class JavaProtocol extends RegistryProtocol implements Protocol {
         registerServer(ProtocolState.STATUS, 0x01, PacketServerStatusPong.class);
 
         registerClient(ProtocolState.LOGIN, 0x00, PacketClientLoginStart.class);
+        registerClient(ProtocolState.LOGIN, 0x01, PacketClientLoginEncryptionResponse.class);
 
         registerServer(ProtocolState.LOGIN, 0x00, PacketServerLoginDisconnect.class);
         registerServer(ProtocolState.LOGIN, 0x01, PacketServerLoginEncryptionRequest.class);

@@ -10,3 +10,5 @@ Minecraft bot for 1.15.2
 - [ ] Improved navigation around the API
    - [ ] Remove public constants such as `PathCommands.WORLD_HANDLER`
    - [ ] Ability to get to Bot via `Bot#getBot()`, `Bot#getBots()`, `Bot#findByUuid(UUID)`
+- [ ] Packet recording functionality
+- [ ] Check path while walking on it, to ensure missing/blocked blocks can be detected/avoided

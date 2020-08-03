@@ -1,7 +1,9 @@
 package me.hfox.craftbot.connection.client;
 
+import me.hfox.craftbot.connection.client.session.Session;
 import me.hfox.craftbot.entity.data.Hand;
 import me.hfox.craftbot.entity.data.PlayerInfo;
+import me.hfox.craftbot.exception.session.BotAuthenticationFailedException;
 import me.hfox.craftbot.handling.ClientHandler;
 import me.hfox.craftbot.protocol.ClientPacket;
 import me.hfox.craftbot.protocol.ServerPacket;
@@ -33,7 +35,8 @@ public class PlayClient extends BasicClient {
 
     private ClientHandler clientHandler;
 
-    public PlayClient() {
+    public PlayClient(Session session) {
+        super(session);
         this.playerInfo = new HashMap<>();
     }
 
@@ -81,7 +84,7 @@ public class PlayClient extends BasicClient {
                             LOGGER.info("Received Bot Player Info, sending status and settings");
                             getConnection().writePacket(new PacketClientPlayClientStatus(ClientStatusAction.RESPAWN));
                             getConnection().writePacket(new PacketClientPlayClientSettings(
-                                    "en_GB", 16, ChatMode.ENABLED, true, 0xFF, Hand.RIGHT
+                                    "en_GB", 32, ChatMode.ENABLED, true, 0xFF, Hand.RIGHT
                             ));
                         }
                     } else {
@@ -136,8 +139,16 @@ public class PlayClient extends BasicClient {
 
     @Override
     protected void onConnect(String host, int port) {
+        try {
+            getSession().authenticate();
+        } catch (BotAuthenticationFailedException ex) {
+            LOGGER.error("Unable to authenticate", ex);
+            getConnection().disconnect();
+            return;
+        }
+
         getConnection().writePacket(new PacketClientHandshake(578, host, port, ProtocolState.LOGIN));
-        getConnection().writePacket(new PacketClientLoginStart("PenguBot"));
+        getConnection().writePacket(new PacketClientLoginStart(getSession().getName()));
     }
 
 }

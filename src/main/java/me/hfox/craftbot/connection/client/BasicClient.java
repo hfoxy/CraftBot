@@ -9,6 +9,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import me.hfox.craftbot.connection.Connection;
 import me.hfox.craftbot.connection.ServerConnection;
+import me.hfox.craftbot.connection.client.session.Session;
 import me.hfox.craftbot.entity.data.PlayerInfo;
 import me.hfox.craftbot.exception.connection.BotConnectionException;
 import me.hfox.craftbot.exception.protocol.BotProtocolException;
@@ -31,7 +32,13 @@ public class BasicClient implements Client {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BasicClient.class);
 
+    private final Session session;
+
     private ProtocolHandler handler;
+
+    public BasicClient(Session session) {
+        this.session = session;
+    }
 
     @Override
     public void connect(String host, int port) throws BotConnectionException {
@@ -100,6 +107,11 @@ public class BasicClient implements Client {
         }
 
         return null;
+    }
+
+    @Override
+    public Session getSession() {
+        return session;
     }
 
     @Override
