@@ -1,14 +1,23 @@
 package me.hfox.craftbot.protocol.pipeline;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import me.hfox.craftbot.connection.Connection;
+import me.hfox.craftbot.protocol.Packet;
+import me.hfox.craftbot.protocol.play.server.PacketServerPlayChunkData;
 import me.hfox.craftbot.protocol.stream.ProtocolBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class PacketDecoder extends ByteToMessageDecoder {
 

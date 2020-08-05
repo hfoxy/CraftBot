@@ -99,35 +99,35 @@ class ChunkStreamTest {
 
     @Test
     void validateRead() {
-        List<Long> longs = new ArrayList<>();
-        longs.add(-6148914691236517206L); // 1010101010101010101010101010101010101010101010101010101010101010
-        longs.add(-6148914691236517206L); // 1010101010101010101010101010101010101010101010101010101010101010
+        long[] longs = new long[2];
+        longs[0] = -6148914691236517206L; // 1010101010101010101010101010101010101010101010101010101010101010
+        longs[1] = -6148914691236517206L; // 1010101010101010101010101010101010101010101010101010101010101010
 
         ChunkStream stream = new ChunkStream(longs, (short) 4);
 
-        int length = longs.size() * 8 * 2;
+        int length = longs.length * 8 * 2;
         for (int i = 0; i < length; i++) {
             assertEquals(10, stream.read(), "failed on " + i + " index");
         }
 
         assertEquals(0, stream.readableBits());
 
-        longs = new ArrayList<>();
-        longs.add(6148914691236517205L); // 0101010101010101010101010101010101010101010101010101010101010101
-        longs.add(6148914691236517205L); // 0101010101010101010101010101010101010101010101010101010101010101
+        longs = new long[2];
+        longs[0] = 6148914691236517205L; // 0101010101010101010101010101010101010101010101010101010101010101
+        longs[1] = 6148914691236517205L; // 0101010101010101010101010101010101010101010101010101010101010101
 
         stream = new ChunkStream(longs, (short) 4);
 
-        length = longs.size() * 8 * 2;
+        length = longs.length * 8 * 2;
         for (int i = 0; i < length; i++) {
             assertEquals(5, stream.read(), "failed on " + i + " index");
         }
 
         assertEquals(0, stream.readableBits());
 
-        longs = new ArrayList<>();
-        longs.add(6148914691236517205L); // 0101010101010101010101010101010101010101010101010101010101010101
-        longs.add(6148914691236517205L); // 0101010101010101010101010101010101010101010101010101010101010101
+        longs = new long[2];
+        longs[0] = 6148914691236517205L; // 0101010101010101010101010101010101010101010101010101010101010101
+        longs[1] = 6148914691236517205L; // 0101010101010101010101010101010101010101010101010101010101010101
 
         stream = new ChunkStream(longs, (short) 5);
 
@@ -150,12 +150,7 @@ class ChunkStreamTest {
         int[] palette = new int[]{0, 6, 1, 68, 4, 70, 71, 10, 2, 66, 1344, 34, 1346, 1345, 3945, 9, 1341};
 
         short bitsPerBlock = 5;
-        List<Long> longs = new ArrayList<>();
-        for (long l : chunk) {
-            longs.add(l);
-        }
-
-        ChunkStream stream = new ChunkStream(longs, bitsPerBlock);
+        ChunkStream stream = new ChunkStream(chunk, bitsPerBlock);
         for (int y = 0; y < 16; y++) {
             for (int z = 0; z < 16; z++) {
                 for (int x = 0; x < 16; x++) {

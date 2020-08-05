@@ -47,13 +47,17 @@ public class TerminalReader extends Thread {
             return;
         }
 
+        handleCommand(line, aphelion, console);
+    }
+
+    public static <T extends CommandSender> void handleCommand(String line, Aphelion<T> aphelion, T console) {
         String[] split = line.split(" ");
         String[] args = new String[split.length - 1];
         if (args.length > 0) {
             System.arraycopy(split, 1, args, 0, args.length);
         }
 
-        CommandHandler<CommandSender> handler = aphelion.getCommand(split[0]);
+        CommandHandler<T> handler = aphelion.getCommand(split[0]);
         if (handler == null) {
             LOGGER.warn("Unknown command '{}'", split[0]);
             return;
@@ -63,14 +67,14 @@ public class TerminalReader extends Thread {
             handler.invoke(aphelion, console, split[0], args);
         } catch (CommandUsageException ex) {
             if (ex.getMessage() != null) {
-                LOGGER.error("Invalid command usage: {}", ex.getMessage());
+                console.sendMessage(Level.ERROR, "Invalid command usage: {}", ex.getMessage());
             } else {
-                LOGGER.error("Invalid command usage");
+                console.sendMessage(Level.ERROR, "Invalid command usage");
             }
 
-            LOGGER.error("{} {}", split[0], handler.getUsage());
+            console.sendMessage(Level.ERROR, "{} {}", split[0], handler.getUsage());
         } catch (CommandException ex) {
-            LOGGER.error("Unable to parse command", ex);
+            console.sendException(Level.ERROR, "Unable to parse command", ex);
         }
     }
 

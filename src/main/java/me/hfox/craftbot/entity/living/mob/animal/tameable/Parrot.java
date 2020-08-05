@@ -1,4 +1,4 @@
-package me.hfox.craftbot.entity.living.mob.animal;
+package me.hfox.craftbot.entity.living.mob.animal.tameable;
 
 import me.hfox.craftbot.entity.data.ParrotType;
 

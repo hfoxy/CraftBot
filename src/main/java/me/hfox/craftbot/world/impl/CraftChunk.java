@@ -39,23 +39,32 @@ public class CraftChunk implements Chunk {
 
     private void checkValid(Location location) {
         boolean fail = false;
-        StringJoiner invalid = new StringJoiner(", ", "[", "]");
         if (location.getChunkX() != x) {
-            invalid.add("x=" + location.getBlockX());
             fail = true;
         }
 
         if (location.getBlockY() < 0 || location.getBlockY() >= 256) {
-            invalid.add("y=" + location.getBlockY());
             fail = true;
         }
 
         if (location.getChunkZ() != z) {
-            invalid.add("z=" + location.getBlockZ());
             fail = true;
         }
 
         if (fail) {
+            StringJoiner invalid = new StringJoiner(", ", "[", "]");
+            if (location.getChunkX() != x) {
+                invalid.add("x=" + location.getBlockX());
+            }
+
+            if (location.getBlockY() < 0 || location.getBlockY() >= 256) {
+                invalid.add("y=" + location.getBlockY());
+            }
+
+            if (location.getChunkZ() != z) {
+                invalid.add("z=" + location.getBlockZ());
+            }
+
             throw new BotUnknownBlockException("Bad location: " + invalid);
         }
     }
@@ -84,6 +93,10 @@ public class CraftChunk implements Chunk {
         Preconditions.checkNotNull(blockState, "blockState should not be null");
 
         checkValid(location);
+        _setBlock(location, blockState);
+    }
+
+    private synchronized void _setBlock(Location location, BlockStateDto blockState) {
         blocks[location.getChunkBlockX()][location.getBlockY()][location.getChunkBlockZ()] = blockState;
     }
 

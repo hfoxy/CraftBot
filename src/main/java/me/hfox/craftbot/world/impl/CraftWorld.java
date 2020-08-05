@@ -21,16 +21,18 @@ public class CraftWorld implements World {
     private final Client client;
 
     private final Map<Integer, Entity> entities;
+    private final Object entityLock = new Object();
     private final Object playersLock = new Object();
     private final Set<Player> players;
 
+    private final Object chunkLock = new Object();
     private final Map<Integer, Map<Integer, Chunk>> chunks;
 
     public CraftWorld(Client client) {
         this.client = client;
-        this.entities = new ConcurrentHashMap<>();
+        this.entities = new HashMap<>();
         this.players = new HashSet<>();
-        this.chunks = new ConcurrentHashMap<>();
+        this.chunks = new HashMap<>();
     }
 
     @Override
@@ -40,12 +42,14 @@ public class CraftWorld implements World {
 
     @Override
     public Map<Integer, Entity> getEntities() {
-        return new HashMap<>(entities);
+        synchronized (entityLock) {
+            return new HashMap<>(entities);
+        }
     }
 
     @Override
     public Optional<Entity> findEntityById(int entityId) {
-        return Optional.ofNullable(entities.get(entityId));
+        return Optional.ofNullable(getEntities().get(entityId));
     }
 
     @Override
@@ -57,45 +61,51 @@ public class CraftWorld implements World {
 
     @Override
     public <E extends Entity> E addEntity(E entity) {
-        entities.put(entity.getId(), entity);
+        synchronized (entityLock) {
+            entities.put(entity.getId(), entity);
 
-        synchronized (playersLock) {
-            if (entity instanceof Player) {
-                players.add((Player) entity);
+            synchronized (playersLock) {
+                if (entity instanceof Player) {
+                    players.add((Player) entity);
+                }
             }
-        }
 
-        return entity;
+            return entity;
+        }
     }
 
     @Override
     public List<Entity> removeEntitiesById(int[] entityIds) {
-        List<Entity> list = new ArrayList<>();
-        for (int entityId : entityIds) {
-            Entity removed = entities.remove(entityId);
-            synchronized (playersLock) {
-                if (removed instanceof Player) {
-                    players.remove(removed);
-                    // TODO: trigger some form of player disconnect event?
+        synchronized (entityLock) {
+            List<Entity> list = new ArrayList<>();
+            for (int entityId : entityIds) {
+                Entity removed = entities.remove(entityId);
+                synchronized (playersLock) {
+                    if (removed instanceof Player) {
+                        players.remove(removed);
+                        // TODO: trigger some form of player disconnect event?
+                    }
+                }
+
+                if (removed != null) {
+                    list.add(removed);
                 }
             }
 
-            if (removed != null) {
-                list.add(removed);
-            }
+            return list;
         }
-
-        return list;
     }
 
     @Override
     public Optional<Chunk> getChunk(int chunkX, int chunkZ) {
-        Map<Integer, Chunk> xChunks = chunks.get(chunkX);
-        if (xChunks == null) {
-            return Optional.empty();
-        }
+        synchronized (chunkLock) {
+            Map<Integer, Chunk> xChunks = chunks.get(chunkX);
+            if (xChunks == null) {
+                return Optional.empty();
+            }
 
-        return Optional.ofNullable(xChunks.get(chunkZ));
+            return Optional.ofNullable(xChunks.get(chunkZ));
+        }
     }
 
     @Override
@@ -104,15 +114,19 @@ public class CraftWorld implements World {
     }
 
     @Override
-    public void loadChunk(int chunkX, int chunkZ) {
-        chunks.computeIfAbsent(chunkX, (k) -> new ConcurrentHashMap<>()).put(chunkZ, new CraftChunk(chunkX, chunkZ));
+    public synchronized void loadChunk(int chunkX, int chunkZ) {
+        synchronized (chunkLock) {
+            chunks.computeIfAbsent(chunkX, (k) -> new ConcurrentHashMap<>()).put(chunkZ, new CraftChunk(chunkX, chunkZ));
+        }
     }
 
     @Override
     public void unloadChunk(int chunkX, int chunkZ) {
-        Map<Integer, Chunk> xChunks = chunks.get(chunkX);
-        if (xChunks != null) {
-            xChunks.remove(chunkZ);
+        synchronized (chunkLock) {
+            Map<Integer, Chunk> xChunks = chunks.get(chunkX);
+            if (xChunks != null) {
+                xChunks.remove(chunkZ);
+            }
         }
     }
 

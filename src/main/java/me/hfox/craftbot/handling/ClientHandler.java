@@ -2,7 +2,6 @@ package me.hfox.craftbot.handling;
 
 import me.hfox.craftbot.connection.Connection;
 import me.hfox.craftbot.connection.client.Client;
-import me.hfox.craftbot.entity.Entities;
 import me.hfox.craftbot.entity.EntityRegistration;
 import me.hfox.craftbot.entity.data.PlayerInfo;
 import me.hfox.craftbot.entity.data.creation.PlayerCreationData;
@@ -32,8 +31,7 @@ import java.util.concurrent.TimeUnit;
 public class ClientHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientHandler.class);
-
-    private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(10);
+    private static final ScheduledExecutorService EXECUTOR = Executors.newScheduledThreadPool(100);
 
     private final Client client;
 
@@ -72,7 +70,7 @@ public class ClientHandler {
     }
 
     public void start() {
-        tickTask = executorService.scheduleAtFixedRate(() -> {
+        tickTask = EXECUTOR.scheduleWithFixedDelay(() -> {
             Connection connection = client.getConnection();
             if (connection == null || !connection.isConnected()) {
                 stop();
@@ -98,7 +96,7 @@ public class ClientHandler {
 
     public void onReceive(ServerPacket packet) {
         if (packet instanceof PacketServerPlayJoinGame) {
-            LOGGER.info("Attempting to join game");
+            LOGGER.debug("Attempting to join game");
             PacketServerPlayJoinGame joinGame = (PacketServerPlayJoinGame) packet;
 
             World world = worldHandler.getWorld();

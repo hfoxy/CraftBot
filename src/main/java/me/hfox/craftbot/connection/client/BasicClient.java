@@ -7,42 +7,68 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import me.hfox.aphelion.Aphelion;
 import me.hfox.craftbot.connection.Connection;
 import me.hfox.craftbot.connection.ServerConnection;
 import me.hfox.craftbot.connection.client.session.Session;
 import me.hfox.craftbot.entity.data.PlayerInfo;
 import me.hfox.craftbot.exception.connection.BotConnectionException;
 import me.hfox.craftbot.exception.protocol.BotProtocolException;
-import me.hfox.craftbot.handling.ClientHandler;
-import me.hfox.craftbot.protocol.ClientPacket;
+import me.hfox.craftbot.exception.session.BotAuthenticationFailedException;
 import me.hfox.craftbot.protocol.JavaProtocol;
 import me.hfox.craftbot.protocol.Protocol;
-import me.hfox.craftbot.protocol.ServerPacket;
-import me.hfox.craftbot.protocol.login.server.PacketServerLoginSuccess;
 import me.hfox.craftbot.protocol.pipeline.ProtocolHandler;
+import me.hfox.craftbot.terminal.Console;
+import me.hfox.craftbot.terminal.Level;
+import me.hfox.craftbot.terminal.TerminalReader;
+import me.hfox.craftbot.terminal.commands.bot.ChatCommands;
+import me.hfox.craftbot.terminal.commands.bot.PathingCommands;
+import me.hfox.craftbot.terminal.commands.bot.ServerCommands;
+import me.hfox.craftbot.terminal.commands.bot.WorldCommands;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.Future;
 
-public class BasicClient implements Client {
+public class BasicClient<C extends Client> implements Client {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BasicClient.class);
 
     private final Session session;
+    private final Console console;
+    private final Aphelion<C> aphelion;
 
     private ProtocolHandler handler;
+    private boolean chatEnabled;
 
-    public BasicClient(Session session) {
+    public BasicClient(Class<C> clazz, Session session) throws BotAuthenticationFailedException {
         this.session = session;
+        this.session.authenticate();
+
+        this.console = new Console(session.getName());
+        this.aphelion = new Aphelion<C>(clazz) {
+            @Override
+            public boolean hasPermission(C commandSender, String s) {
+                return true;
+            }
+        };
+
+        this.chatEnabled = true;
+        aphelion.getRegistration().register(ChatCommands.class);
+        aphelion.getRegistration().register(ServerCommands.class);
+        aphelion.getRegistration().register(PathingCommands.class);
+        aphelion.getRegistration().register(WorldCommands.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    public C getMe() {
+        return (C) this;
     }
 
     @Override
     public void connect(String host, int port) throws BotConnectionException {
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        EventLoopGroup workerGroup = new NioEventLoopGroup(10);
 
         boolean safe = false;
         try {
@@ -53,11 +79,11 @@ public class BasicClient implements Client {
 
             handler = new BasicClientProtocolHandler(this);
             bootstrap.handler(handler);
-            LOGGER.info("client init");
+            LOGGER.debug("client init");
 
             // Start the client.
             ChannelFuture channel = bootstrap.connect(host, port).sync();
-            LOGGER.info("client started");
+            LOGGER.debug("client started");
 
             onConnect(host, port);
             safe = true;
@@ -66,7 +92,7 @@ public class BasicClient implements Client {
                 try {
                     // Wait until the connection is closed.
                     channel.channel().closeFuture().sync();
-                    LOGGER.info("client stopped");
+                    LOGGER.debug("client stopped");
                 } catch (Exception ex) {
                     LOGGER.error("Unable to stop safely");
                 } finally {
@@ -127,6 +153,41 @@ public class BasicClient implements Client {
     @Override
     public Map<UUID, PlayerInfo> getKnownPlayers() {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean isChatEnabled() {
+        return chatEnabled;
+    }
+
+    @Override
+    public void setChatEnabled(boolean chatEnabled) {
+        this.chatEnabled = chatEnabled;
+    }
+
+    @Override
+    public void sendMessage(Level level, String message, Object... args) {
+        console.sendMessage(level, message, args);
+    }
+
+    @Override
+    public void sendMessage(String message, Object... args) {
+        console.sendMessage(message, args);
+    }
+
+    @Override
+    public void sendException(Level level, String message, Throwable throwable) {
+        console.sendException(level, message, throwable);
+    }
+
+    @Override
+    public void sendException(String message, Throwable throwable) {
+        console.sendException(message, throwable);
+    }
+
+    @Override
+    public void execute(String command) {
+        TerminalReader.handleCommand(command, aphelion, getMe());
     }
 
 }

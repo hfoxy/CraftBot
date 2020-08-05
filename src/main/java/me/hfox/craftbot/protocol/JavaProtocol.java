@@ -72,11 +72,13 @@ public class JavaProtocol extends RegistryProtocol implements Protocol {
         registerClient(ProtocolState.PLAY, 0x12, PacketClientPlayPlayerPositionAndRotation.class);
         registerClient(ProtocolState.PLAY, 0x14, PacketClientPlayPlayerMovement.class);
         registerClient(ProtocolState.PLAY, 0x1B, PacketClientPlayEntityAction.class);
+        registerClient(ProtocolState.PLAY, 0x24, PacketClientPlayUpdateCommandBlock.class);
 
         registerServer(ProtocolState.PLAY, 0x00, PacketServerPlaySpawnEntity.class);
         registerServer(ProtocolState.PLAY, 0x03, PacketServerPlaySpawnLivingEntity.class);
         registerServer(ProtocolState.PLAY, 0x05, PacketServerPlaySpawnPlayer.class);
         registerServer(ProtocolState.PLAY, 0x06, PacketServerPlayEntityAnimation.class);
+        registerServer(ProtocolState.PLAY, 0x09, PacketServerPlayBlockBreakAnimation.class);
         registerServer(ProtocolState.PLAY, 0x0C, PacketServerPlayBlockChange.class);
         registerServer(ProtocolState.PLAY, 0x0E, PacketServerPlayServerDifficulty.class);
         registerServer(ProtocolState.PLAY, 0x0F, PacketServerPlayChatMessage.class);
@@ -93,6 +95,7 @@ public class JavaProtocol extends RegistryProtocol implements Protocol {
         registerServer(ProtocolState.PLAY, 0x21, PacketServerPlayKeepAlive.class);
         registerServer(ProtocolState.PLAY, 0x22, PacketServerPlayChunkData.class);
         registerServer(ProtocolState.PLAY, 0x23, PacketServerPlayEffect.class);
+        registerServer(ProtocolState.PLAY, 0x24, PacketServerPlayParticle.class);
         registerServer(ProtocolState.PLAY, 0x25, PacketServerPlayUpdateLight.class);
         registerServer(ProtocolState.PLAY, 0x26, PacketServerPlayJoinGame.class);
         registerServer(ProtocolState.PLAY, 0x29, PacketServerPlayEntityPosition.class);
@@ -108,7 +111,9 @@ public class JavaProtocol extends RegistryProtocol implements Protocol {
         registerServer(ProtocolState.PLAY, 0x3E, PacketServerPlayWorldBorder.class);
         registerServer(ProtocolState.PLAY, 0x40, PacketServerPlayHeldItemChange.class);
         registerServer(ProtocolState.PLAY, 0x41, PacketServerPlayUpdateViewPosition.class);
+        registerServer(ProtocolState.PLAY, 0x42, PacketServerPlayUpdateViewDistance.class);
         registerServer(ProtocolState.PLAY, 0x44, PacketServerPlayEntityMetadata.class);
+        registerServer(ProtocolState.PLAY, 0x45, PacketServerPlayAttachEntity.class);
         registerServer(ProtocolState.PLAY, 0x46, PacketServerPlayEntityVelocity.class);
         registerServer(ProtocolState.PLAY, 0x47, PacketServerPlayEntityEquipment.class);
         registerServer(ProtocolState.PLAY, 0x48, PacketServerPlaySetExperience.class);

@@ -1,6 +1,6 @@
 package me.hfox.craftbot.entity.living.mob.water;
 
-public interface TropicalFish extends Fish {
+public interface TropicalFish extends FishBase {
 
     int getVariant();
 

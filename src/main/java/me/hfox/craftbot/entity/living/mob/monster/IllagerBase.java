@@ -1,4 +1,4 @@
 package me.hfox.craftbot.entity.living.mob.monster;
 
-public interface ZombifiedPiglin extends Zombie {
+public interface IllagerBase extends Raider {
 }

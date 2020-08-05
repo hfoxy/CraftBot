@@ -7,23 +7,35 @@ public class Console implements CommandSender {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Console.class);
 
+    private final String prefix;
+
+    public Console() {
+        this(null);
+    }
+
+    public Console(String prefix) {
+        this.prefix = prefix;
+    }
+
     @Override
     public void sendMessage(Level level, String message, Object... args) {
+        String out = prefix != null ? "[" + prefix + "] " + message : message;
+
         switch (level) {
             case DEBUG:
-                LOGGER.debug(message, args);
+                LOGGER.debug(out, args);
                 break;
             case TRACE:
-                LOGGER.trace(message, args);
+                LOGGER.trace(out, args);
                 break;
             case INFO:
-                LOGGER.info(message, args);
+                LOGGER.info(out, args);
                 break;
             case WARN:
-                LOGGER.warn(message, args);
+                LOGGER.warn(out, args);
                 break;
             case ERROR:
-                LOGGER.error(message, args);
+                LOGGER.error(out, args);
                 break;
         }
     }
@@ -35,21 +47,23 @@ public class Console implements CommandSender {
 
     @Override
     public void sendException(Level level, String message, Throwable throwable) {
+        String out = prefix != null ? "[" + prefix + "] " + message : message;
+
         switch (level) {
             case DEBUG:
-                LOGGER.debug(message, throwable);
+                LOGGER.debug(out, throwable);
                 break;
             case TRACE:
-                LOGGER.trace(message, throwable);
+                LOGGER.trace(out, throwable);
                 break;
             case INFO:
-                LOGGER.info(message, throwable);
+                LOGGER.info(out, throwable);
                 break;
             case WARN:
-                LOGGER.warn(message, throwable);
+                LOGGER.warn(out, throwable);
                 break;
             case ERROR:
-                LOGGER.error(message, throwable);
+                LOGGER.error(out, throwable);
                 break;
         }
     }

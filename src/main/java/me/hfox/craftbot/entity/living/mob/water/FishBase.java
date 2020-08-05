@@ -1,6 +1,6 @@
 package me.hfox.craftbot.entity.living.mob.water;
 
-public interface Fish extends WaterAnimal {
+public interface FishBase extends WaterAnimal {
 
     boolean isFromBucket();
 

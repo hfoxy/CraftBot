@@ -1,0 +1,8 @@
+{
+  "validateUrl": "https://authserver.mojang.com/validate",
+  "authenticateUrl": "https://authserver.mojang.com/authenticate",
+  "refreshUrl": "https://authserver.mojang.com/refresh",
+  "joinUrl": "https://sessionserver.mojang.com/session/minecraft/join",
+  "accountsPerCheck": 5,
+  "checkIntervalMillis": 360000
+}

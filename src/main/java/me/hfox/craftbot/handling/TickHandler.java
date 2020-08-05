@@ -96,23 +96,13 @@ public class TickHandler implements Runnable {
     public void run() {
         try {
             int tick = tickCounter.getAndIncrement();
+            //LOGGER.info("[{}] Tick!", clientHandler.getClient().getName());
 
             int currentSize = EntityRegistration.MISSING_ENTITIES.size();
             if (savedMissing != null && savedMissing.size() != currentSize) {
-                LOGGER.info("Missing entities ({}): {} - found {} new", currentSize, EntityRegistration.MISSING_ENTITIES, (currentSize - savedMissing.size()));
+                LOGGER.debug("Missing entities ({}): {} - found {} new", currentSize, EntityRegistration.MISSING_ENTITIES, (currentSize - savedMissing.size()));
             } else if (savedMissing != null && tick > 0 && tick % 100 == 0) {
-                LOGGER.info("Missing entities ({}): {}", currentSize, EntityRegistration.MISSING_ENTITIES);
-                // clientHandler.getClient().getConnection().writePacket(new PacketClientPlayChatMessage("Missing " + currentSize + " entities: " + savedMissing));
-
-                Collection<Entity> entities = clientHandler.getWorldHandler().getWorld().getEntities().values();
-                for (Entity entity : entities) {
-                    if (entity instanceof Player) {
-                        Player p = (Player) entity;
-
-                        Location loc = entity.getLocation().minus(0, 1, 0);
-                        LOGGER.debug("Block under {}'s feet is {} ({})", p.getName(), clientHandler.getWorldHandler().getWorld().getBlock(loc), loc);
-                    }
-                }
+                LOGGER.debug("Missing entities ({}): {}", currentSize, EntityRegistration.MISSING_ENTITIES);
             }
 
             List<Tile> tiles = clientHandler.getTiles();
@@ -229,7 +219,10 @@ public class TickHandler implements Runnable {
             } else {
                 first = true;
                 clientHandler.getClient().getConnection().writePacket(new PacketClientPlayPlayerMovement(true));
-                clientHandler.getPlayer().setSprinting(false);
+
+                if (clientHandler.getPlayer() != null) {
+                    clientHandler.getPlayer().setSprinting(false);
+                }
             }
 
             savedMissing = new HashSet<>(EntityRegistration.MISSING_ENTITIES);

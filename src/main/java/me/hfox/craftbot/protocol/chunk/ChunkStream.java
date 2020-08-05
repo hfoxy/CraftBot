@@ -16,8 +16,8 @@ public class ChunkStream {
     private int index;
     private long value;
 
-    public ChunkStream(List<Long> dataArray, short bitsPerBlock) {
-        this.dataArray = new long[dataArray.size()];
+    public ChunkStream(long[] dataArray, short bitsPerBlock) {
+        this.dataArray = dataArray;
         int index = 0;
         for (Long l : dataArray) {
             this.dataArray[index++] = l;

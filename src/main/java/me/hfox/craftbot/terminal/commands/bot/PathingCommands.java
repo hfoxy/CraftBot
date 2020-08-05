@@ -1,51 +1,40 @@
-package me.hfox.craftbot.terminal.commands;
+package me.hfox.craftbot.terminal.commands.bot;
 
+import me.hfox.craftbot.connection.client.Client;
+import me.hfox.craftbot.connection.client.PlayClient;
 import me.hfox.craftbot.pathing.AStar;
 import me.hfox.craftbot.pathing.PathingResult;
-import me.hfox.craftbot.pathing.Tile;
 import me.hfox.aphelion.command.CommandContext;
 import me.hfox.aphelion.command.annotations.Command;
 import me.hfox.aphelion.exception.CommandException;
 import me.hfox.aphelion.exception.CommandUsageException;
-import me.hfox.craftbot.connection.client.PlayClient;
 import me.hfox.craftbot.entity.living.ClientPlayer;
-import me.hfox.craftbot.exception.connection.BotConnectionException;
 import me.hfox.craftbot.handling.WorldHandler;
 import me.hfox.craftbot.terminal.CommandSender;
 import me.hfox.craftbot.terminal.Level;
 import me.hfox.craftbot.world.Location;
-import me.hfox.craftbot.world.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 public class PathingCommands {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PathingCommands.class);
 
-    public static WorldHandler WORLD_HANDLER;
-
     @Command(aliases = {"toggle-sprint", "sprint"}, description = "Toggles sprinting", max = 0)
-    public static void toggleSprint(CommandSender sender, CommandContext<CommandSender> args) throws CommandException, InterruptedException, AStar.InvalidPathException {
-        ClientPlayer player = WORLD_HANDLER.getClientHandler().getPlayer();
+    public static void toggleSprint(PlayClient sender, CommandContext<CommandSender> args) throws CommandException, InterruptedException, AStar.InvalidPathException {
+        ClientPlayer player = sender.getClientHandler().getPlayer();
         player.setSprinting(!player.isSprinting());
 
         sender.sendMessage("Player is {} sprinting ({})", player.isSprinting() ? "now" : "no longer", player.isSprinting());
     }
 
     @Command(aliases = {"path-recalculate", "p-rc"}, description = "Recalculate path lookup table", max = 0)
-    public static void pathRecalculate(CommandSender sender, CommandContext<CommandSender> args) throws CommandException, InterruptedException, AStar.InvalidPathException {
-        WORLD_HANDLER.getClientHandler().getTickHandler().recalculateDiffLookupTables();
+    public static void pathRecalculate(PlayClient sender, CommandContext<CommandSender> args) throws CommandException, InterruptedException, AStar.InvalidPathException {
+        sender.getClientHandler().getTickHandler().recalculateDiffLookupTables();
     }
 
     @Command(aliases = {"path"}, description = "Find a path", usage = "[x] [y] [z] {sprinting}", max = 4)
-    public static void path(CommandSender sender, CommandContext<CommandSender> args) throws CommandException, InterruptedException, AStar.InvalidPathException {
-        if (WORLD_HANDLER == null) {
-            sender.sendMessage(Level.ERROR, "Unable to path, no WorldHandler");
-            return;
-        }
-
+    public static void path(PlayClient sender, CommandContext<CommandSender> args) throws CommandException, InterruptedException, AStar.InvalidPathException {
         boolean sprint;
         Location end;
         if (args.length() < 3) {
@@ -56,11 +45,11 @@ public class PathingCommands {
             sprint = args.getBoolean(3, false);
         }
 
-        PathingResult result = WORLD_HANDLER.getClientHandler().path(end, 300);
+        PathingResult result = sender.getClientHandler().path(end, 300);
         sender.sendMessage("Result: " + result);
 
         if (result == PathingResult.SUCCESS) {
-            WORLD_HANDLER.getClientHandler().getPlayer().setSprinting(sprint);
+            sender.getClientHandler().getPlayer().setSprinting(sprint);
         }
     }
 

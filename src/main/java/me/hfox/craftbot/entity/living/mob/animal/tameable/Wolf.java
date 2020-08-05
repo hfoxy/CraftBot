@@ -1,4 +1,4 @@
-package me.hfox.craftbot.entity.living.mob.animal;
+package me.hfox.craftbot.entity.living.mob.animal.tameable;
 
 public interface Wolf extends Tameable {
 

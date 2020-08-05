@@ -9,10 +9,9 @@ import me.hfox.craftbot.entity.data.creation.PlayerCreationData;
 import me.hfox.craftbot.entity.living.Player;
 import me.hfox.craftbot.exception.entity.BotUnsupportedEntityException;
 import me.hfox.craftbot.protocol.ServerPacket;
-import me.hfox.craftbot.protocol.play.client.PacketClientPlayChatMessage;
 import me.hfox.craftbot.protocol.play.server.*;
 import me.hfox.craftbot.protocol.play.server.data.entity.EntityMetadata;
-import me.hfox.craftbot.terminal.commands.PathingCommands;
+import me.hfox.craftbot.terminal.commands.bot.PathingCommands;
 import me.hfox.craftbot.world.Location;
 import me.hfox.craftbot.world.World;
 import me.hfox.craftbot.world.impl.CraftWorld;
@@ -21,17 +20,20 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.*;
 
 public class WorldHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WorldHandler.class);
+
+    private final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
+    private final Executor executor = new ThreadPoolExecutor(10, 1000, 1, TimeUnit.MINUTES, queue);
 
     private final ClientHandler clientHandler;
     private final World world;
     private final ChunkHandler chunkHandler;
 
     public WorldHandler(ClientHandler clientHandler) {
-        PathingCommands.WORLD_HANDLER = this;
         this.clientHandler = clientHandler;
         this.world = new CraftWorld(clientHandler.getClient());
         this.chunkHandler = new ChunkHandler(this);
@@ -144,7 +146,7 @@ public class WorldHandler {
             });
         }
 
-        chunkHandler.onReceive(packet);
+        executor.execute(() -> chunkHandler.onReceive(packet));
     }
 
 }

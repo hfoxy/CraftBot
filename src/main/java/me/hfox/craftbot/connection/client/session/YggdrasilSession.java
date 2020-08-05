@@ -2,74 +2,180 @@ package me.hfox.craftbot.connection.client.session;
 
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
+import me.hfox.craftbot.Bot;
+import me.hfox.craftbot.auth.AccountDto;
 import me.hfox.craftbot.connection.client.session.dto.request.AuthRefreshDto;
 import me.hfox.craftbot.connection.client.session.dto.request.AuthValidateDto;
 import me.hfox.craftbot.connection.client.session.dto.request.AuthenticationAgentDto;
 import me.hfox.craftbot.connection.client.session.dto.request.AuthenticationDto;
+import me.hfox.craftbot.connection.client.session.dto.response.AuthErrorResponse;
 import me.hfox.craftbot.connection.client.session.dto.response.AuthSessionResponseDto;
 import me.hfox.craftbot.connection.client.session.dto.response.RefreshSessionResponseDto;
 import me.hfox.craftbot.exception.session.BotAuthenticationFailedException;
 import me.hfox.craftbot.exception.session.BotRefreshTokenFailedException;
 import me.hfox.craftbot.utils.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.UUID;
+import java.util.function.Function;
 
 public class YggdrasilSession implements Session {
 
+    public static final long SESSION_TIMEOUT = 4 * 60 * 60 * 1000; // 4 hours
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(YggdrasilSession.class);
+
     private static final String TOKEN_CHARS = "abcdefghijklmnopqrstuvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
-    private final String username;
-    private final String password;
-
-    private String accessToken;
-    private String clientToken;
-    private String name;
-    private UUID uniqueId;
+    private final AccountDto accountDto;
+    private Function<AccountDto, Void> updateAction;
 
     public YggdrasilSession(String username, String password) {
-        this.username = username;
-        this.password = password;
+        this.accountDto = new AccountDto();
+        this.accountDto.setUsername(username);
+        this.accountDto.setPassword(password);
     }
 
-    private boolean hasAuthenticatedBefore() {
-        return !(name == null || uniqueId == null || accessToken == null || clientToken == null);
+    public YggdrasilSession(AccountDto accountDto) {
+        this(accountDto, null);
+    }
+
+    public YggdrasilSession(AccountDto accountDto, Function<AccountDto, Void> updateAction) {
+        this.accountDto = accountDto;
+        this.updateAction = updateAction;
+    }
+
+    public Function<AccountDto, ?> getUpdateAction() {
+        return updateAction;
+    }
+
+    public void setUpdateAction(Function<AccountDto, Void> updateAction) {
+        this.updateAction = updateAction;
+    }
+
+    private void persist() {
+        if (updateAction != null) {
+            updateAction.apply(accountDto);
+        }
+    }
+
+    public String getUsername() {
+        return accountDto.getUsername();
+    }
+
+    public String getPassword() {
+        return accountDto.getPassword();
+    }
+
+    public String getAccessToken() {
+        return accountDto.getAccessToken();
+    }
+
+    private void setAccessToken(String accessToken) {
+        this.accountDto.setAccessToken(accessToken);
+    }
+
+    public String getClientToken() {
+        return accountDto.getClientToken();
+    }
+
+    private void setClientToken(String clientToken) {
+        this.accountDto.setClientToken(clientToken);
+    }
+
+    private boolean hasAuthenticationDetails() {
+        return getName() != null && getUniqueId() != null && getAccessToken() != null && getClientToken() != null;
+    }
+
+    private boolean isAuthenticationCached() {
+        if (!hasAuthenticationDetails()) {
+            return false;
+        }
+
+        // LOGGER.info("{} && ({} - {}) < {}: {}", isAuthenticated(), System.currentTimeMillis(), getLastAuthenticated(), SESSION_TIMEOUT, result);
+        return isAuthenticated() && (System.currentTimeMillis() - getLastAuthenticated()) < SESSION_TIMEOUT;
     }
 
     @Override
     public boolean isOnline() {
-        if (!hasAuthenticatedBefore()) {
+        if (!hasAuthenticationDetails()) {
             return false;
         }
 
-        AuthValidateDto validateDto = new AuthValidateDto(accessToken, clientToken);
-        int validationResult = Unirest.post("https://authserver.mojang.com/validate")
+        if (isAuthenticationCached()) {
+            return true;
+        }
+
+        AuthValidateDto validateDto = new AuthValidateDto(getAccessToken(), getClientToken());
+        int validationResult = Unirest.post(Bot.getSessionConfiguration().getValidateUrl())
                 .body(validateDto).header("Content-Type", "application/json").asEmpty().getStatus();
 
-        return validationResult == 200 || validationResult == 204;
+        boolean result = validationResult == 200 || validationResult == 204;
+        if (result) {
+            setLastAuthenticated(System.currentTimeMillis());
+        }
+
+        setAuthenticated(result);
+        persist();
+        return result;
     }
 
     @Override
     public String getName() {
-        return name;
+        return accountDto.getName();
+    }
+
+    private void setName(String name) {
+        this.accountDto.setName(name);
     }
 
     @Override
     public UUID getUniqueId() {
-        return uniqueId;
+        return accountDto.getUniqueId();
+    }
+
+    private void setUniqueId(UUID uniqueId) {
+        this.accountDto.setUniqueId(uniqueId);
+    }
+
+    public boolean isAuthenticated() {
+        return accountDto.isAuthenticated();
+    }
+
+    private void setAuthenticated(boolean authenticated) {
+        this.accountDto.setAuthenticated(authenticated);
+    }
+
+    public long getLastAuthenticated() {
+        return accountDto.getLastAuthenticated();
+    }
+
+    private void setLastAuthenticated(long lastAuthenticated) {
+        this.accountDto.setLastAuthenticated(lastAuthenticated);
     }
 
     private void performAuthentication() throws BotAuthenticationFailedException {
-        clientToken = StringUtils.generateRandomString(TOKEN_CHARS, 32);
+        setClientToken(StringUtils.generateRandomString(TOKEN_CHARS, 32));
 
         AuthenticationDto authDto = new AuthenticationDto(
                 new AuthenticationAgentDto("Minecraft", 1),
-                username, password, clientToken, false
+                getUsername(), getPassword(), getClientToken(), false
         );
 
-        HttpResponse<AuthSessionResponseDto> response = Unirest.post("https://authserver.mojang.com/authenticate")
+        HttpResponse<AuthSessionResponseDto> response = Unirest.post(Bot.getSessionConfiguration().getAuthenticateUrl())
                 .body(authDto).header("Content-Type", "application/json").asObject(AuthSessionResponseDto.class);
 
         if (response.getStatus() != 200) {
+            AuthErrorResponse errorResponse = response.mapError(AuthErrorResponse.class);
+            if (errorResponse != null) {
+                LOGGER.debug("Error! {}", errorResponse.getErrorMessage());
+                if (errorResponse.getErrorMessage() != null && errorResponse.getErrorMessage().toLowerCase().contains("invalid credentials")) {
+                    accountDto.setInvalidDetails(true);
+                    persist();
+                }
+            }
+
             throw new BotAuthenticationFailedException("Unable to authenticate: Status " + response.getStatus() + " - " + response.getStatusText());
         }
 
@@ -78,19 +184,23 @@ public class YggdrasilSession implements Session {
             throw new BotAuthenticationFailedException("Unable to parse response body");
         }
 
-        accessToken = sessionDto.getAccessToken();
-        name = sessionDto.getSelectedProfile().getName();
-        uniqueId = StringUtils.toUuid(sessionDto.getSelectedProfile().getId());
+        setAccessToken(sessionDto.getAccessToken());
+        setName(sessionDto.getSelectedProfile().getName());
+        setUniqueId(StringUtils.toUuid(sessionDto.getSelectedProfile().getId()));
+
+        setAuthenticated(true);
+        setLastAuthenticated(System.currentTimeMillis());
+        persist();
     }
 
     private void refreshToken() throws BotRefreshTokenFailedException {
-        if (!hasAuthenticatedBefore()) {
+        if (!hasAuthenticationDetails()) {
             throw new BotRefreshTokenFailedException("Session has never been authenticated");
         }
 
-        AuthRefreshDto refreshRequestDto = new AuthRefreshDto(accessToken, clientToken, false);
+        AuthRefreshDto refreshRequestDto = new AuthRefreshDto(getAccessToken(), getClientToken(), false);
 
-        HttpResponse<RefreshSessionResponseDto> response = Unirest.post("https://authserver.mojang.com/refresh")
+        HttpResponse<RefreshSessionResponseDto> response = Unirest.post(Bot.getSessionConfiguration().getRefreshUrl())
                 .body(refreshRequestDto).header("Content-Type", "application/json").asObject(AuthSessionResponseDto.class);
 
         if (response.getStatus() != 200) {
@@ -102,9 +212,13 @@ public class YggdrasilSession implements Session {
             throw new BotRefreshTokenFailedException("Unable to parse response body");
         }
 
-        accessToken = refreshDto.getAccessToken();
-        name = refreshDto.getSelectedProfile().getName();
-        uniqueId = StringUtils.toUuid(refreshDto.getSelectedProfile().getId());
+        setAccessToken(refreshDto.getAccessToken());
+        setName(refreshDto.getSelectedProfile().getName());
+        setUniqueId(StringUtils.toUuid(refreshDto.getSelectedProfile().getId()));
+
+        setAuthenticated(true);
+        setLastAuthenticated(System.currentTimeMillis());
+        persist();
     }
 
     @Override
@@ -127,8 +241,8 @@ public class YggdrasilSession implements Session {
     public void joinServer(String serverHash) throws BotAuthenticationFailedException {
         authenticate();
 
-        AuthValidateDto validateDto = new AuthValidateDto(accessToken, clientToken);
-        int validationResult = Unirest.post("https://authserver.mojang.com/validate")
+        AuthValidateDto validateDto = new AuthValidateDto(getAccessToken(), getClientToken());
+        int validationResult = Unirest.post(Bot.getSessionConfiguration().getValidateUrl())
                 .body(validateDto).header("Content-Type", "application/json").asEmpty().getStatus();
 
         if (validationResult != 204 && validationResult != 200) {

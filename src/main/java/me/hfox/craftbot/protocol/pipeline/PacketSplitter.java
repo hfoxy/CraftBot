@@ -19,6 +19,10 @@ public class PacketSplitter extends ByteToMessageDecoder {
         ProtocolBuffer buffer = new ProtocolBuffer(byteBuf);
 
         buffer.markReaderIndex();
+        if (buffer.readableBytes() < 3) {
+            return;
+        }
+
         byte[] length = new byte[3];
 
         for (int i = 0; i < length.length; ++i) {

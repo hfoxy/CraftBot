@@ -1,4 +1,6 @@
-package me.hfox.craftbot.entity.living.mob.animal;
+package me.hfox.craftbot.entity.living.mob.animal.tameable;
+
+import me.hfox.craftbot.entity.living.mob.animal.Animal;
 
 import java.util.Optional;
 import java.util.UUID;

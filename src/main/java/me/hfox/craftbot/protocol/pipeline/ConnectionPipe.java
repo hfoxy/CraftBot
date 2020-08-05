@@ -5,6 +5,8 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import me.hfox.craftbot.connection.Connection;
 import me.hfox.craftbot.protocol.ServerPacket;
 
+import java.util.concurrent.*;
+
 public class ConnectionPipe extends ChannelInboundHandlerAdapter {
 
     private final Connection connection;

@@ -1,6 +1,6 @@
 package me.hfox.craftbot.entity.living.mob.water;
 
-public interface PufferFish extends Fish {
+public interface PufferFish extends FishBase {
 
     int getPuffState();
 

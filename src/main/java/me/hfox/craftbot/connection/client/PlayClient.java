@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class PlayClient extends BasicClient {
+public class PlayClient extends BasicClient<PlayClient> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PlayClient.class);
 
@@ -35,9 +35,15 @@ public class PlayClient extends BasicClient {
 
     private ClientHandler clientHandler;
 
-    public PlayClient(Session session) {
-        super(session);
+    public PlayClient(Session session) throws BotAuthenticationFailedException {
+        super(PlayClient.class, session);
+        this.uniqueId = session.getUniqueId();
+        this.name = session.getName();
         this.playerInfo = new HashMap<>();
+    }
+
+    public ClientHandler getClientHandler() {
+        return clientHandler;
     }
 
     @Override
@@ -78,13 +84,13 @@ public class PlayClient extends BasicClient {
                         info = new PlayerInfo(addPlayer.getUuid(), addPlayer.getName(), addPlayer.getProperties());
                         playerInfo.put(addPlayer.getUuid(), info);
 
-                        LOGGER.info("Received Player Info for '{}' - {}", info.getName(), info.getUuid());
+                        LOGGER.debug("Received Player Info for '{}' - {}", info.getName(), info.getUuid());
 
                         if (addPlayer.getUuid().equals(uniqueId)) {
-                            LOGGER.info("Received Bot Player Info, sending status and settings");
+                            LOGGER.debug("Received Bot Player Info, sending status and settings");
                             getConnection().writePacket(new PacketClientPlayClientStatus(ClientStatusAction.RESPAWN));
                             getConnection().writePacket(new PacketClientPlayClientSettings(
-                                    "en_GB", 32, ChatMode.ENABLED, true, 0xFF, Hand.RIGHT
+                                    "en_GB", 16, ChatMode.ENABLED, true, 0xFF, Hand.RIGHT
                             ));
                         }
                     } else {
@@ -97,11 +103,15 @@ public class PlayClient extends BasicClient {
                         name = info.getName();
                     }
 
-                    LOGGER.info("Removing Player Info for '{}' - {}", name, action.getUuid());
+                    LOGGER.debug("Removing Player Info for '{}' - {}", name, action.getUuid());
                     playerInfo.remove(action.getUuid());
                     continue;
                 } else {
                     info = playerInfo.get(action.getUuid());
+                }
+
+                if (info == null) {
+                    continue;
                 }
 
                 if (action instanceof PlayerInfoActionDisplayName) {
