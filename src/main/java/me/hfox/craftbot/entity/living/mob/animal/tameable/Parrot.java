@@ -4,8 +4,8 @@ import me.hfox.craftbot.entity.data.ParrotType;
 
 public interface Parrot extends Tameable {
 
-    ParrotType getParrotType();
+    ParrotType getType();
 
-    void setParrotType(ParrotType parrotType);
+    void setType(ParrotType parrotType);
 
 }

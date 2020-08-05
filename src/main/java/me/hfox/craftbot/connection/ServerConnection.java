@@ -41,6 +41,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class ServerConnection implements Connection {
 
@@ -49,7 +52,10 @@ public class ServerConnection implements Connection {
     private final Client client;
     private final SocketChannel channel;
     private final Compression compression;
+    private final BlockingQueue<ServerPacket> packets;
+    private final Thread packetHandle;
 
+    private boolean exitPoll;
     private Protocol protocol;
 
     public ServerConnection(Client client, SocketChannel channel, Protocol protocol) {
@@ -57,6 +63,19 @@ public class ServerConnection implements Connection {
         this.channel = channel;
         this.compression = new CompressionImpl();
         this.protocol = protocol;
+        this.packets = new LinkedBlockingQueue<>();
+        this.packetHandle = new Thread(() -> {
+            while (!exitPoll) {
+                ServerPacket packet = packets.poll();
+                try {
+                    client.onReceive(packet);
+                } catch (Throwable ex) {
+                    LOGGER.error("Unable to pass Packet to client", ex);
+                }
+            }
+        });
+
+        this.packetHandle.start();
     }
 
     public SocketChannel getChannel() {
@@ -81,6 +100,7 @@ public class ServerConnection implements Connection {
     @Override
     public void disconnect() {
         channel.close();
+        exitPoll = true;
     }
 
     @Override
@@ -106,12 +126,6 @@ public class ServerConnection implements Connection {
                 && !(packet instanceof PacketServerPlayDestroyEntities)) {
             LOGGER.info("Received {}", packet.getClass().getSimpleName());
         }*/
-
-        try {
-            client.onReceive(packet);
-        } catch (Throwable ex) {
-            LOGGER.error("Unable to pass Packet to client", ex);
-        }
 
         if (packet instanceof PacketServerStatusResponse) {
             ServerListPingResponse response = ((PacketServerStatusResponse) packet).getResponse();
@@ -153,7 +167,6 @@ public class ServerConnection implements Connection {
                 disconnect();
             }
         } else if (packet instanceof PacketServerLoginSuccess) {
-            LOGGER.debug("Login success!");
             protocol.setState(ProtocolState.PLAY);
 
             try {
@@ -162,6 +175,7 @@ public class ServerConnection implements Connection {
                 LOGGER.error("Unable to complete login", ex);
             }
 
+            LOGGER.info("Login success!");
         } else if (packet instanceof PacketServerLoginSetCompression) {
             int threshold = ((PacketServerLoginSetCompression) packet).getThreshold();
             getCompression().enable(threshold);
@@ -171,49 +185,23 @@ public class ServerConnection implements Connection {
             LOGGER.info("Disconnected: '{}'", reason);
             disconnect();
         } else if (packet instanceof PacketServerPlayKeepAlive) {
+            LOGGER.info("Keepin' alive");
             writePacket(new PacketClientPlayKeepAlive(((PacketServerPlayKeepAlive) packet).getKeepAliveId()));
-        } else if (packet instanceof PacketServerPlayJoinGame) {
-            PacketServerPlayJoinGame joinGame = (PacketServerPlayJoinGame) packet;
-            LOGGER.debug("Joining game...");
-            LOGGER.debug("  - Entity ID      : {}", joinGame.getEntityId());
-            LOGGER.debug("  - Gamemode       : {}", joinGame.getGamemode());
-            LOGGER.debug("  - Dimension      : {}", joinGame.getDimension());
-            LOGGER.debug("  - Seed           : {}", joinGame.getSeed());
-            LOGGER.debug("  - Max player     : {}", joinGame.getMaxPlayers());
-            LOGGER.debug("  - Level type     : {}", joinGame.getLevelType());
-            LOGGER.debug("  - View distance  : {}", joinGame.getViewDistance());
-            LOGGER.debug("  - Reduced debug  : {}", joinGame.isReducedDebug());
-            LOGGER.debug("  - Respawn screen : {}", joinGame.isRespawnScreen());
         } else if (packet instanceof PacketServerPlayChatMessage && client.isChatEnabled()) {
             PacketServerPlayChatMessage chatMessage = (PacketServerPlayChatMessage) packet;
             LOGGER.info("[{}]: {}", chatMessage.getPosition(), chatMessage.getChat());
         } else if (packet instanceof PacketServerPlayPluginMessage) {
             PacketServerPlayPluginMessage pluginMessage = (PacketServerPlayPluginMessage) packet;
             LOGGER.debug("[PLUGIN] [{}]: {}", pluginMessage.getChannel(), new String(pluginMessage.getData()));
-        } else if (packet instanceof PacketServerPlayServerDifficulty) {
-            PacketServerPlayServerDifficulty serverDifficulty = (PacketServerPlayServerDifficulty) packet;
-            LOGGER.debug("Server difficulty: {} (locked: {})", serverDifficulty.getDifficulty(), serverDifficulty.isDifficultyLocked());
-        } else if (packet instanceof PacketServerPlayPlayerAbilities) {
-            PacketServerPlayPlayerAbilities playerAbilities = (PacketServerPlayPlayerAbilities) packet;
-            LOGGER.debug("Player abilities:");
-            LOGGER.debug("  - FOV: {}", playerAbilities.getFieldOfViewModifier());
-            LOGGER.debug("  - Flight speed: {}", playerAbilities.getFlyingSpeed());
-            LOGGER.debug("    - Invulnerable : {}", playerAbilities.getAbilities().isInvulnerable());
-            LOGGER.debug("    - Flying       : {}", playerAbilities.getAbilities().isFlying());
-            LOGGER.debug("    - Allow flying : {}", playerAbilities.getAbilities().isAllowFlying());
-            LOGGER.debug("    - Instant break: {}", playerAbilities.getAbilities().isInstantBreak());
-        } else if (packet instanceof PacketServerPlayHeldItemChange) {
-            PacketServerPlayHeldItemChange heldItemChange = (PacketServerPlayHeldItemChange) packet;
-            LOGGER.debug("Held item: {}", heldItemChange.getSlot());
         } else if (packet instanceof PacketServerPlayPlayerPositionAndLook) {
             PacketServerPlayPlayerPositionAndLook positionAndLook = (PacketServerPlayPlayerPositionAndLook) packet;
             writePacket(new PacketClientPlayTeleportConfirm(positionAndLook.getTeleportId()));
         } else if (packet instanceof PacketServerPlayDisconnect) {
             PacketServerPlayDisconnect disconnect = (PacketServerPlayDisconnect) packet;
             LOGGER.info("Disconnected by server: {}", disconnect.getReason());
-        } else if (packet instanceof PacketServerPlayChangeGameState) {
-            LOGGER.debug("Told to change game state: {}", packet);
         }
+
+        packets.add(packet);
     }
 
     @Override

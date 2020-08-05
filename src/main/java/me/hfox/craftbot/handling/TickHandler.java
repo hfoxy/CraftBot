@@ -96,7 +96,7 @@ public class TickHandler implements Runnable {
     public void run() {
         try {
             int tick = tickCounter.getAndIncrement();
-            //LOGGER.info("[{}] Tick!", clientHandler.getClient().getName());
+            // LOGGER.info("[{}] Tick!", clientHandler.getClient().getName());
 
             int currentSize = EntityRegistration.MISSING_ENTITIES.size();
             if (savedMissing != null && savedMissing.size() != currentSize) {
@@ -106,7 +106,14 @@ public class TickHandler implements Runnable {
             }
 
             List<Tile> tiles = clientHandler.getTiles();
-            if (tiles != null) {
+            if (tiles == null) {
+                first = true;
+                clientHandler.getClient().getConnection().writePacket(new PacketClientPlayPlayerMovement(true));
+
+                if (clientHandler.getPlayer() != null) {
+                    clientHandler.getPlayer().setSprinting(false);
+                }
+            } else {
                 Location currentLocation = clientHandler.getPlayer().getLocation();
                 int remainingTicks = getTicksPerTile() - (tick % getTicksPerTile());
                 if (first || remainingTicks == getTicksPerTile()) {
@@ -216,13 +223,6 @@ public class TickHandler implements Runnable {
                 }
 
                 first = false;
-            } else {
-                first = true;
-                clientHandler.getClient().getConnection().writePacket(new PacketClientPlayPlayerMovement(true));
-
-                if (clientHandler.getPlayer() != null) {
-                    clientHandler.getPlayer().setSprinting(false);
-                }
             }
 
             savedMissing = new HashSet<>(EntityRegistration.MISSING_ENTITIES);

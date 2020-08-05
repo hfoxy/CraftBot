@@ -14,8 +14,10 @@ import me.hfox.craftbot.terminal.CommandSender;
 import me.hfox.craftbot.terminal.Level;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -65,18 +67,36 @@ public class BotCommands {
             targets.add(bot.findByName(targetString).orElseThrow(() -> new CommandUsageException("Unknown client '" + targetString + "'")));
         }
 
-        int delay = 1000;
+        int delay = 4000;
         String cmd = args.getJoinedString(1);
         boolean delayed = cmd.startsWith("connect");
 
-        int i = 0;
+        if (delayed) {
+            Iterator<Client> iterator = targets.iterator();
+            DelayedCommand delayedCommand = new DelayedCommand();
+            delayedCommand.future = SCHEDULER.scheduleWithFixedDelay(() -> {
+                if (!iterator.hasNext()) {
+                    delayedCommand.future.cancel(false);
+                    return;
+                }
+
+                Client client = iterator.next();
+                client.execute(cmd);
+            }, 100, delay, TimeUnit.MILLISECONDS);
+        } else {
+            for (Client client : targets) {
+                client.execute(cmd);
+            }
+        }
+
+        /*int i = 0;
         for (Client client : targets) {
             if (delayed) {
                 SCHEDULER.schedule(() -> client.execute(cmd), delay * i++, TimeUnit.MILLISECONDS);
             } else {
                 client.execute(cmd);
             }
-        }
+        }*/
 
         sender.sendMessage("Done! ('{}')", cmd);
     }
@@ -84,6 +104,12 @@ public class BotCommands {
     @Command(aliases = {"accounts"}, description = "Lists accounts", max = 0)
     public static void accounts(CommandSender sender, CommandContext<CommandSender> args) throws CommandException {
         //
+    }
+
+    private static class DelayedCommand {
+
+        private Future<?> future;
+
     }
 
 }

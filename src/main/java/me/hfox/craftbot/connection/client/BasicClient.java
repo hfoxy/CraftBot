@@ -68,7 +68,7 @@ public class BasicClient<C extends Client> implements Client {
 
     @Override
     public void connect(String host, int port) throws BotConnectionException {
-        EventLoopGroup workerGroup = new NioEventLoopGroup(10);
+        EventLoopGroup workerGroup = new NioEventLoopGroup();
 
         boolean safe = false;
         try {

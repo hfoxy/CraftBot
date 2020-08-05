@@ -103,8 +103,6 @@ public class ClientHandler {
             player = EntityRegistration.createClientPlayer(new PlayerCreationData(
                     world, joinGame.getEntityId(), client.getUniqueId(), playerInfo.get(client.getUniqueId())
             ));
-
-            LOGGER.info("Joined game");
         } else if (packet instanceof PacketServerPlayPlayerPositionAndLook) {
             PacketServerPlayPlayerPositionAndLook positionAndLook = (PacketServerPlayPlayerPositionAndLook) packet;
 

@@ -18,6 +18,9 @@ import me.hfox.craftbot.entity.impl.living.mob.animal.CraftPig;
 import me.hfox.craftbot.entity.impl.living.mob.animal.CraftSheep;
 import me.hfox.craftbot.entity.impl.living.mob.flying.CraftPhantom;
 import me.hfox.craftbot.entity.impl.living.mob.monster.*;
+import me.hfox.craftbot.entity.impl.living.mob.tameable.CraftCat;
+import me.hfox.craftbot.entity.impl.living.mob.tameable.CraftParrot;
+import me.hfox.craftbot.entity.impl.living.mob.tameable.CraftWolf;
 import me.hfox.craftbot.entity.impl.living.mob.water.*;
 import me.hfox.craftbot.entity.impl.projectile.CraftArrow;
 import me.hfox.craftbot.entity.impl.thrown.*;
@@ -30,6 +33,9 @@ import me.hfox.craftbot.entity.living.mob.animal.Chicken;
 import me.hfox.craftbot.entity.living.mob.animal.Cow;
 import me.hfox.craftbot.entity.living.mob.animal.Pig;
 import me.hfox.craftbot.entity.living.mob.animal.Sheep;
+import me.hfox.craftbot.entity.living.mob.animal.tameable.Cat;
+import me.hfox.craftbot.entity.living.mob.animal.tameable.Parrot;
+import me.hfox.craftbot.entity.living.mob.animal.tameable.Wolf;
 import me.hfox.craftbot.entity.living.mob.flying.Phantom;
 import me.hfox.craftbot.entity.living.mob.monster.*;
 import me.hfox.craftbot.entity.living.mob.water.*;
@@ -40,6 +46,7 @@ public class Entities {
 
     public static final EntityType<Arrow, ?> ARROW = new BaseEntityType<>(CraftArrow.class, 2, "minecraft:arrow");
     public static final EntityType<Bat, ?> BAT = new BaseEntityType<>(CraftBat.class, 3, "minecraft:bat");
+    public static final EntityType<Cat, ?> CAT = new BaseEntityType<>(CraftCat.class, 7, "minecraft:cat");
     public static final EntityType<Chicken, ?> CHICKEN = new BaseEntityType<>(CraftChicken.class, 9, "minecraft:chicken");
     public static final EntityType<Cod, ?> COD = new BaseEntityType<>(CraftCod.class, 10, "minecraft:cod");
     public static final EntityType<Cow, ?> COW = new BaseEntityType<>(CraftCow.class, 11, "minecraft:cow");
@@ -53,6 +60,7 @@ public class Entities {
     public static final EntityType<FallingBlock, ?> FALLING_BLOCK = new BaseEntityType<>(CraftFallingBlock.class, 26, "minecraft:falling_block");
     public static final EntityType<Illusioner, ?> ILLUSIONER = new BaseEntityType<>(CraftIllusioner.class, 34, "minecraft:illusioner");
     public static final EntityType<ItemEntity, ?> ITEM = new BaseEntityType<>(CraftItemEntity.class, 35, "minecraft:item");
+    public static final EntityType<Parrot, ?> PARROT = new BaseEntityType<>(CraftParrot.class, 54, "minecraft:parrot");
     public static final EntityType<Pig, ?> PIG = new BaseEntityType<>(CraftPig.class, 55, "minecraft:pig");
     public static final EntityType<PufferFish, ?> PUFFER_FISH = new BaseEntityType<>(CraftPufferFish.class, 56, "minecraft:pufferfish");
     public static final EntityType<ZombiePigman, ?> ZOMBIE_PIGMAN = new BaseEntityType<>(CraftZombiePigman.class, 57, "minecraft:zombie_pigman");
@@ -71,6 +79,7 @@ public class Entities {
     public static final EntityType<Vindicator, ?> VINDICATOR = new BaseEntityType<>(CraftVindicator.class, 87, "minecraft:vindicator");
     public static final EntityType<Pillager, ?> PILLAGER = new BaseEntityType<>(CraftPillager.class, 88, "minecraft:pillager");
     public static final EntityType<Witch, ?> WITCH = new BaseEntityType<>(CraftWitch.class, 90, "minecraft:witch");
+    public static final EntityType<Wolf, ?> WOLF = new BaseEntityType<>(CraftWolf.class, 94, "minecraft:wolf");
     public static final EntityType<Zombie, ?> ZOMBIE = new BaseEntityType<>(CraftZombie.class, 95, "minecraft:zombie");
     public static final EntityType<ZombieVillager, ?> ZOMBIE_VILLAGER = new BaseEntityType<>(CraftZombieVillager.class, 97, "minecraft:zombie_villager");
     public static final EntityType<Phantom, ?> PHANTOM = new BaseEntityType<>(CraftPhantom.class, 98, "minecraft:phantom");

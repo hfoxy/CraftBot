@@ -114,9 +114,9 @@ public class CraftWorld implements World {
     }
 
     @Override
-    public synchronized void loadChunk(int chunkX, int chunkZ) {
+    public synchronized Chunk loadChunk(int chunkX, int chunkZ) {
         synchronized (chunkLock) {
-            chunks.computeIfAbsent(chunkX, (k) -> new ConcurrentHashMap<>()).put(chunkZ, new CraftChunk(chunkX, chunkZ));
+            return chunks.computeIfAbsent(chunkX, (k) -> new ConcurrentHashMap<>()).computeIfAbsent(chunkZ, (z) -> new CraftChunk(chunkX, chunkZ));
         }
     }
 

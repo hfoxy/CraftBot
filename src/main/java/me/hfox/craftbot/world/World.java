@@ -28,7 +28,7 @@ public interface World {
 
     Optional<Chunk> getChunkByLocation(Location location);
 
-    void loadChunk(int chunkX, int chunkZ);
+    Chunk loadChunk(int chunkX, int chunkZ);
 
     void unloadChunk(int chunkX, int chunkZ);
 

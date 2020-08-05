@@ -96,6 +96,12 @@ public class CraftChunk implements Chunk {
         _setBlock(location, blockState);
     }
 
+    @Override
+    public void setBlockAtChunkLocation(int x, int y, int z, BlockStateDto blockState) {
+        Preconditions.checkNotNull(blockState, "blockState should not be null");
+        blocks[x][y][z] = blockState;
+    }
+
     private synchronized void _setBlock(Location location, BlockStateDto blockState) {
         blocks[location.getChunkBlockX()][location.getBlockY()][location.getChunkBlockZ()] = blockState;
     }

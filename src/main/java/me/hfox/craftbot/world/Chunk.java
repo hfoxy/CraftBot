@@ -8,4 +8,6 @@ public interface Chunk {
 
     void setBlockAt(Location location, BlockStateDto blockState);
 
+    void setBlockAtChunkLocation(int x, int y, int z, BlockStateDto blockState);
+
 }

@@ -8,6 +8,7 @@ import me.hfox.craftbot.protocol.stream.ProtocolBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.SocketException;
 import java.util.List;
 
 public class PacketSplitter extends ByteToMessageDecoder {
@@ -56,7 +57,12 @@ public class PacketSplitter extends ByteToMessageDecoder {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        LOGGER.error("uh oh", cause);
+        if (cause instanceof SocketException) {
+            // we have been disconnected :(
+            return;
+        }
+
+        LOGGER.error("Unexpected error occurred!", cause);
     }
 
 }

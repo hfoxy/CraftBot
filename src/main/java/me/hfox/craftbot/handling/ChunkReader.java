@@ -5,6 +5,7 @@ import me.hfox.craftbot.exception.world.BotUnknownBlockException;
 import me.hfox.craftbot.protocol.chunk.ChunkStream;
 import me.hfox.craftbot.protocol.play.server.PacketServerPlayChunkData;
 import me.hfox.craftbot.protocol.stream.ProtocolBuffer;
+import me.hfox.craftbot.world.Chunk;
 import me.hfox.craftbot.world.Location;
 import me.hfox.craftbot.world.palette.BlockPalette;
 import me.hfox.craftbot.world.palette.BlockStateDto;
@@ -21,26 +22,18 @@ public class ChunkReader {
 
     private static final int CHUNK_HEIGHT = 16;
 
-    private final BlockingQueue<Runnable> poolQueue;
-    private final ThreadPoolExecutor poolExecutor;
-
     private final WorldHandler worldHandler;
 
     public ChunkReader(WorldHandler worldHandler) {
         this.worldHandler = worldHandler;
-
-        // 262144 = 16*16*16 (blocks per chunk) * 128 (arbitrary max chunk queue size)
-        // this.poolQueue = new ArrayBlockingQueue<>(524288);
-        this.poolQueue = new LinkedBlockingQueue<>();
-        this.poolExecutor = new ThreadPoolExecutor(1, 1000, 1, TimeUnit.MINUTES, poolQueue);
     }
 
-    private void loadChunk(int chunkX, int chunkZ) {
-        worldHandler.getWorld().loadChunk(chunkX, chunkZ);
+    private Chunk loadChunk(int chunkX, int chunkZ) {
+        return worldHandler.getWorld().loadChunk(chunkX, chunkZ);
     }
 
     public void readChunk(PacketServerPlayChunkData packet) {
-        loadChunk(packet.getChunkX(), packet.getChunkZ());
+        Chunk chunk = loadChunk(packet.getChunkX(), packet.getChunkZ());
 
         int primaryBitMask = packet.getPrimaryBitMask();
         List<Integer> chunks = new ArrayList<>();
@@ -73,15 +66,15 @@ public class ChunkReader {
 
             ChunkStream stream = new ChunkStream(data, bitsPerBlock);
 
-            int baseChunkX = packet.getChunkX() * 16;
+            // int baseChunkX = packet.getChunkX() * 16;
             int baseChunkY = chunkId * 16;
-            int baseChunkZ = packet.getChunkZ() * 16;
+            // int baseChunkZ = packet.getChunkZ() * 16;
 
             try {
                 for (int y = 0; y < 16; y++) {
                     for (int z = 0; z < 16; z++) {
                         for (int x = 0; x < 16; x++) {
-                            setBlock(palette, new Location(x + baseChunkX, y + baseChunkY, z + baseChunkZ), stream.read());
+                            setBlock(chunk, palette, stream.read(), x, y + baseChunkY, z);
                         }
                     }
                 }
@@ -93,10 +86,12 @@ public class ChunkReader {
         }
     }
 
-    private void setBlock(int[] palette, Location location, int paletteBlockId) {
+    private void setBlock(Chunk chunk, int[] palette, int paletteBlockId, int x, int y, int z) {
         int blockId = palette[paletteBlockId];
         BlockStateDto blockState = BlockPalette.findById(blockId).orElseThrow(() -> new BotUnknownBlockException(Integer.toString(blockId)));
-        worldHandler.getWorld().setBlock(location, blockState);
+        // chunk.setBlockAtChunkLocation(location);
+        // worldHandler.getWorld().setBlock(location, blockState);
+        chunk.setBlockAtChunkLocation(x, y, z, blockState);
     }
 
 }

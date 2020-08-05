@@ -41,7 +41,7 @@ public class ChunkHandler {
         this.chunkReader = new ChunkReader(worldHandler);
     }
 
-    public synchronized void onReceive(ServerPacket packet) {
+    public void onReceive(ServerPacket packet) {
         if (packet instanceof PacketServerPlayChunkData) {
             chunkReader.readChunk((PacketServerPlayChunkData) packet);
         } else if (packet instanceof PacketServerPlayUnloadChunk) {

@@ -6,7 +6,7 @@ public interface Cat extends Tameable {
 
     CatType getType();
 
-    void setCatType(CatType catType);
+    void setType(CatType catType);
 
     boolean getUnknownBooleanA();
 
