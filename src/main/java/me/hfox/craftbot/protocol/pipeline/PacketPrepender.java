@@ -8,6 +8,8 @@ import me.hfox.craftbot.protocol.stream.ProtocolBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static me.hfox.craftbot.protocol.stream.ProtocolBuffer.getBuffer;
+
 public class PacketPrepender extends MessageToByteEncoder<ByteBuf> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PacketPrepender.class);
@@ -23,7 +25,7 @@ public class PacketPrepender extends MessageToByteEncoder<ByteBuf> {
         try {
             int length = input.readableBytes();
 
-            ProtocolBuffer buffer = new ProtocolBuffer(byteBuf);
+            ProtocolBuffer buffer = getBuffer(byteBuf);
             if (!connection.getCompression().isEnabled()) {
                 buffer.writeVarInt(length);
             }

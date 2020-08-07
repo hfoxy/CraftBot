@@ -7,6 +7,7 @@ import me.hfox.craftbot.exception.world.BotChunkNotLoadedException;
 import me.hfox.craftbot.world.Chunk;
 import me.hfox.craftbot.world.Location;
 import me.hfox.craftbot.world.World;
+import me.hfox.craftbot.world.palette.BlockPalette;
 import me.hfox.craftbot.world.palette.BlockStateDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,8 +16,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class CraftWorld implements World {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(CraftWorld.class);
 
     private final Client client;
 
@@ -27,12 +26,19 @@ public class CraftWorld implements World {
 
     private final Object chunkLock = new Object();
     private final Map<Integer, Map<Integer, Chunk>> chunks;
+    private final ChunkBuilder chunkBuilder;
 
     public CraftWorld(Client client) {
         this.client = client;
         this.entities = new HashMap<>();
         this.players = new HashSet<>();
         this.chunks = new HashMap<>();
+
+        if (BlockPalette.getBiggestId() > Short.MAX_VALUE) {
+            this.chunkBuilder = CraftChunkInt::new;
+        } else {
+            this.chunkBuilder = CraftChunkShort::new;
+        }
     }
 
     @Override
@@ -116,7 +122,7 @@ public class CraftWorld implements World {
     @Override
     public synchronized Chunk loadChunk(int chunkX, int chunkZ) {
         synchronized (chunkLock) {
-            return chunks.computeIfAbsent(chunkX, (k) -> new ConcurrentHashMap<>()).computeIfAbsent(chunkZ, (z) -> new CraftChunk(chunkX, chunkZ));
+            return chunks.computeIfAbsent(chunkX, (x) -> new ConcurrentHashMap<>()).computeIfAbsent(chunkZ, (z) -> chunkBuilder.build(chunkX, chunkZ));
         }
     }
 

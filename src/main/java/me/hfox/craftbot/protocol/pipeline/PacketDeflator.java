@@ -13,6 +13,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.zip.Deflater;
 
+import static me.hfox.craftbot.protocol.stream.ProtocolBuffer.getBuffer;
+
 public class PacketDeflator extends MessageToByteEncoder<ByteBuf> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PacketDeflator.class);
@@ -27,16 +29,16 @@ public class PacketDeflator extends MessageToByteEncoder<ByteBuf> {
      * Compresses the input buffer when compression is set and the packet is larger than the threshold
      *
      * @param channelHandlerContext The channel which this packet is being sent through
-     * @param input                 The input buffer
-     * @param output                The output buffer (may be compressed)
+     * @param inBuf                 The input buffer
+     * @param outBuf                The output buffer (may be compressed)
      *
      * @throws Exception
      */
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, ByteBuf inBuf, ByteBuf outBuf) throws Exception {
         try {
-            ProtocolBuffer input = new ProtocolBuffer(inBuf);
-            ProtocolBuffer output = new ProtocolBuffer(outBuf);
+            ProtocolBuffer input = getBuffer(inBuf);
+            ProtocolBuffer output = getBuffer(outBuf);
 
             int length = input.readableBytes();
             if (connection.getCompression().isEnabled()) {

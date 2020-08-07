@@ -19,6 +19,7 @@ public class BlockPalette {
 
     private static final Map<Integer, BlockStateDto> BLOCK_STATES = new HashMap<>();
 
+    private static int BIGGEST_ID;
     private static int AIR_ID;
     private static BlockStateDto AIR;
 
@@ -48,6 +49,10 @@ public class BlockPalette {
                     throw new BotUnknownBlockException("Block ID " + state.getId() + " already exists");
                 }
 
+                if (state.getId() > BIGGEST_ID) {
+                    BIGGEST_ID = state.getId();
+                }
+
                 if (entry.getKey().equals("minecraft:air")) {
                     AIR_ID = state.getId();
                 }
@@ -56,11 +61,15 @@ public class BlockPalette {
             states.addAll(block.getStates());
         }
 
-        LOGGER.info("Loaded {} blocks for a total of {} states", map.size(), states.size());
+        LOGGER.info("Loaded {} blocks for a total of {} states (highest block #{})", map.size(), states.size(), BIGGEST_ID);
     }
 
     public static Optional<BlockStateDto> findById(int blockId) {
         return Optional.ofNullable(BLOCK_STATES.get(blockId));
+    }
+
+    public static int getBiggestId() {
+        return BIGGEST_ID;
     }
 
     public static BlockStateDto getAir() {

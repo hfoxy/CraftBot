@@ -90,7 +90,7 @@ public class PlayClient extends BasicClient<PlayClient> {
                             LOGGER.debug("Received Bot Player Info, sending status and settings");
                             getConnection().writePacket(new PacketClientPlayClientStatus(ClientStatusAction.RESPAWN));
                             getConnection().writePacket(new PacketClientPlayClientSettings(
-                                    "en_GB", 16, ChatMode.ENABLED, true, 0xFF, Hand.RIGHT
+                                    "en_GB", 8, ChatMode.ENABLED, true, 0xFF, Hand.RIGHT
                             ));
                         }
                     } else {

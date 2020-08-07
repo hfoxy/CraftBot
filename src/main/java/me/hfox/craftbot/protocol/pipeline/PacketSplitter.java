@@ -11,13 +11,15 @@ import org.slf4j.LoggerFactory;
 import java.net.SocketException;
 import java.util.List;
 
+import static me.hfox.craftbot.protocol.stream.ProtocolBuffer.getBuffer;
+
 public class PacketSplitter extends ByteToMessageDecoder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PacketSplitter.class);
 
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception {
-        ProtocolBuffer buffer = new ProtocolBuffer(byteBuf);
+        ProtocolBuffer buffer = getBuffer(byteBuf);
 
         buffer.markReaderIndex();
         if (buffer.readableBytes() < 3) {
@@ -35,7 +37,7 @@ public class PacketSplitter extends ByteToMessageDecoder {
             length[i] = buffer.readByte();
 
             if (length[i] > 0) {
-                ProtocolBuffer lbf = new ProtocolBuffer(byteBuf);
+                ProtocolBuffer lbf = getBuffer(byteBuf);
                 buffer.resetReaderIndex();
                 int size = lbf.readVarInt();
                 LOGGER.debug("Read size as {}", size);
@@ -56,7 +58,7 @@ public class PacketSplitter extends ByteToMessageDecoder {
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         if (cause instanceof SocketException) {
             // we have been disconnected :(
             return;

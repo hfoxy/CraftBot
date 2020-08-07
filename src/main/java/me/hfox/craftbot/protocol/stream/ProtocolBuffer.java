@@ -430,4 +430,15 @@ public class ProtocolBuffer extends NestedBuffer {
         return Optional.of(readBlockStateFromId(value));
     }
 
+    public static ProtocolBuffer getBuffer(ByteBuf buf) {
+        ProtocolBuffer buffer;
+        if (buf instanceof ProtocolBuffer) {
+            buffer = (ProtocolBuffer) buf;
+        } else {
+            buffer = new ProtocolBuffer(buf);
+        }
+
+        return buffer;
+    }
+
 }

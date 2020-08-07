@@ -31,7 +31,6 @@ import java.util.concurrent.ScheduledExecutorService;
 public class ClientHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientHandler.class);
-    private static final ScheduledExecutorService EXECUTOR = Executors.newScheduledThreadPool(100);
 
     private final Client client;
 

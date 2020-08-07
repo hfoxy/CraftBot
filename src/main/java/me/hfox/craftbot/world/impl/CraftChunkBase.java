@@ -11,18 +11,14 @@ import org.slf4j.LoggerFactory;
 
 import java.util.StringJoiner;
 
-public class CraftChunk implements Chunk {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(CraftChunk.class);
+public abstract class CraftChunkBase implements Chunk {
 
     private final int x;
     private final int z;
-    private final int[][][] blocks;
 
-    public CraftChunk(int x, int z) {
+    public CraftChunkBase(int x, int z) {
         this.x = x;
         this.z = z;
-        this.blocks = new int[16][256][16];
     }
 
     public int getX() {
@@ -31,10 +27,6 @@ public class CraftChunk implements Chunk {
 
     public int getZ() {
         return z;
-    }
-
-    public int[][][] getBlocks() {
-        return blocks;
     }
 
     private void checkValid(Location location) {
@@ -78,8 +70,12 @@ public class CraftChunk implements Chunk {
         }
 
         // LOGGER.info("blocks... {} -{}", blocks, "done");
+        return getBlockAtChunk(location.getChunkBlockX(), location.getBlockY(), location.getChunkBlockZ());
+    }
 
-        int blockId = blocks[location.getChunkBlockX()][location.getBlockY()][location.getChunkBlockZ()];
+    @Override
+    public BlockStateDto getBlockAtChunk(int x, int y, int z) {
+        int blockId = getBlockIdAtChunk(x, y, z);
         BlockStateDto state;
         if (blockId == -1) {
             state = BlockPalette.getAir();
@@ -96,6 +92,8 @@ public class CraftChunk implements Chunk {
         return BlockPalette.getAir();
     }
 
+    protected abstract int getBlockIdAtChunk(int x, int y, int z);
+
     @Override
     public void setBlockAt(Location location, BlockStateDto blockState) {
         Preconditions.checkNotNull(location, "location should not be null");
@@ -103,11 +101,6 @@ public class CraftChunk implements Chunk {
 
         checkValid(location);
         setBlockAtChunkLocation(location.getChunkBlockX(), location.getBlockY(), location.getChunkBlockZ(), blockState);
-    }
-
-    @Override
-    public synchronized void setBlockAtChunkLocation(int x, int y, int z, int blockId) {
-        blocks[x][y][z] = blockId;
     }
 
     @Override

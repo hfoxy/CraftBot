@@ -18,10 +18,8 @@ import java.util.concurrent.ScheduledExecutorService;
 
 public class ServerCommands {
 
-    private static final ScheduledExecutorService SCHEDULER = Executors.newScheduledThreadPool(2000);
-
     @Command(aliases = {"connect"}, description = "Connect to a server", usage = "[host{:port}]", min = 1, max = 1)
-    public static void connect(Client sender, CommandContext<CommandSender> args) throws CommandException, BotAuthenticationFailedException {
+    public static void connect(Client sender, CommandContext<CommandSender> args) throws CommandException, BotAuthenticationFailedException, BotConnectionException {
         String host = args.getString(0);
         int port = 25565;
         if (host.contains(":")) {
@@ -38,13 +36,7 @@ public class ServerCommands {
 
         String hostF = host;
         int portF = port;
-        SCHEDULER.execute(() -> {
-            try {
-                sender.connect(hostF, portF);
-            } catch (BotConnectionException ex) {
-                sender.sendException("Unable to connect", ex);
-            }
-        });
+        sender.connect(hostF, portF);
     }
 
 }

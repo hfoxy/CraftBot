@@ -1,5 +1,6 @@
 package me.hfox.craftbot.auth;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import me.hfox.craftbot.Bot;
 import me.hfox.craftbot.CraftBotImpl;
 import me.hfox.craftbot.exception.session.BotAuthenticationFailedException;
@@ -10,17 +11,15 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class BotAutoAuthenticator implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BotAutoAuthenticator.class);
 
-    private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(10);
+    private final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("auto-auth-%d").build();
+    private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(10, threadFactory);
 
     private final Object lock = new Object();
 

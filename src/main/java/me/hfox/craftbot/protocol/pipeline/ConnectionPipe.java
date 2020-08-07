@@ -19,6 +19,7 @@ public class ConnectionPipe extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         super.channelRead(ctx, msg);
 
+        // System.out.println(msg.getClass().getName());
         if (msg instanceof ServerPacket) {
             connection.handle((ServerPacket) msg);
         }

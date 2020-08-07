@@ -19,7 +19,9 @@ public class PacketServerPlayParticle implements ServerPacket {
     private float offsetZ;
     private float data;
     private int count;
-    private ProtocolBuffer dataBuffer;
+    private byte[] content;
+
+    // private ProtocolBuffer dataBuffer;
 
     public int getParticleTypeId() {
         return particleTypeId;
@@ -61,8 +63,12 @@ public class PacketServerPlayParticle implements ServerPacket {
         return count;
     }
 
-    public ProtocolBuffer getDataBuffer() {
+    /*public ProtocolBuffer getDataBuffer() {
         return dataBuffer;
+    }*/
+
+    public byte[] getContent() {
+        return content;
     }
 
     @Override
@@ -78,9 +84,9 @@ public class PacketServerPlayParticle implements ServerPacket {
         data = buffer.readFloat();
         count = buffer.readInt();
 
-        byte[] content = new byte[buffer.readableBytes()];
+        content = new byte[buffer.readableBytes()];
         buffer.readBytes(content);
-        dataBuffer = new ProtocolBuffer(Unpooled.copiedBuffer(content));
+        // dataBuffer = new ProtocolBuffer(Unpooled.copiedBuffer(content));
     }
 
 }

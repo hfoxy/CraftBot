@@ -9,6 +9,8 @@ import me.hfox.craftbot.protocol.stream.ProtocolBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static me.hfox.craftbot.protocol.stream.ProtocolBuffer.getBuffer;
+
 public class PacketEncoder extends MessageToByteEncoder<ClientPacket> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PacketEncoder.class);
@@ -21,7 +23,7 @@ public class PacketEncoder extends MessageToByteEncoder<ClientPacket> {
 
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, ClientPacket clientPacket, ByteBuf byteBuf) throws Exception {
-        ProtocolBuffer buffer = new ProtocolBuffer(byteBuf);
+        ProtocolBuffer buffer = getBuffer(byteBuf);
 
         try {
             connection.getProtocol().write(connection, buffer, clientPacket);

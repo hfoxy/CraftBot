@@ -3,9 +3,9 @@ package me.hfox.craftbot.connection;
 import io.netty.channel.socket.SocketChannel;
 import me.hfox.craftbot.chat.ChatComponent;
 import me.hfox.craftbot.connection.client.Client;
+import me.hfox.craftbot.connection.client.ConnectAction;
 import me.hfox.craftbot.connection.compression.Compression;
 import me.hfox.craftbot.connection.compression.CompressionImpl;
-import me.hfox.craftbot.entity.data.Hand;
 import me.hfox.craftbot.exception.connection.BotEncryptionException;
 import me.hfox.craftbot.exception.session.BotAuthenticationFailedException;
 import me.hfox.craftbot.protocol.ClientPacket;
@@ -18,32 +18,22 @@ import me.hfox.craftbot.protocol.login.server.PacketServerLoginDisconnect;
 import me.hfox.craftbot.protocol.login.server.PacketServerLoginEncryptionRequest;
 import me.hfox.craftbot.protocol.login.server.PacketServerLoginSetCompression;
 import me.hfox.craftbot.protocol.login.server.PacketServerLoginSuccess;
-import me.hfox.craftbot.protocol.play.client.PacketClientPlayClientSettings;
-import me.hfox.craftbot.protocol.play.client.PacketClientPlayClientStatus;
 import me.hfox.craftbot.protocol.play.client.PacketClientPlayKeepAlive;
 import me.hfox.craftbot.protocol.play.client.PacketClientPlayTeleportConfirm;
-import me.hfox.craftbot.protocol.play.client.data.ChatMode;
-import me.hfox.craftbot.protocol.play.client.data.ClientStatusAction;
 import me.hfox.craftbot.protocol.play.server.*;
 import me.hfox.craftbot.protocol.status.client.PacketClientStatusPing;
 import me.hfox.craftbot.protocol.status.server.PacketServerStatusPong;
 import me.hfox.craftbot.protocol.status.server.PacketServerStatusResponse;
 import me.hfox.craftbot.protocol.status.server.data.ServerListPingResponse;
 import me.hfox.craftbot.utils.CryptoUtils;
-import me.hfox.craftbot.world.Location;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.crypto.SecretKey;
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class ServerConnection implements Connection {
 
@@ -54,26 +44,41 @@ public class ServerConnection implements Connection {
     private final Compression compression;
     private final BlockingQueue<ServerPacket> packets;
     private final Thread packetHandle;
+    private final ConnectAction connectAction;
 
+    private boolean firstHealth;
     private boolean exitPoll;
     private Protocol protocol;
 
-    public ServerConnection(Client client, SocketChannel channel, Protocol protocol) {
+    public ServerConnection(Client client, SocketChannel channel, Protocol protocol, ConnectAction action) {
         this.client = client;
         this.channel = channel;
         this.compression = new CompressionImpl();
         this.protocol = protocol;
         this.packets = new LinkedBlockingQueue<>();
+        this.connectAction = action;
+        this.firstHealth = true;
         this.packetHandle = new Thread(() -> {
             while (!exitPoll) {
-                ServerPacket packet = packets.poll();
+                ServerPacket packet;
+                try {
+                    packet = packets.poll(25, TimeUnit.SECONDS);
+                } catch (InterruptedException ex) {
+                    // we have been interrupted
+                    return;
+                }
+
+                if (packet == null) {
+                    continue;
+                }
+
                 try {
                     client.onReceive(packet);
                 } catch (Throwable ex) {
                     LOGGER.error("Unable to pass Packet to client", ex);
                 }
             }
-        });
+        }, "packet-handle-" + client.getName());
 
         this.packetHandle.start();
     }
@@ -99,7 +104,12 @@ public class ServerConnection implements Connection {
 
     @Override
     public void disconnect() {
-        channel.close();
+        try {
+            channel.close();
+        } catch (Exception ex) {
+            // unable close
+        }
+
         exitPoll = true;
     }
 
@@ -185,8 +195,14 @@ public class ServerConnection implements Connection {
             LOGGER.info("[{}] Disconnected: '{}'", client.getName(), reason);
             disconnect();
         } else if (packet instanceof PacketServerPlayKeepAlive) {
-            LOGGER.info("[{}] Keepin' alive", client.getName());
             writePacket(new PacketClientPlayKeepAlive(((PacketServerPlayKeepAlive) packet).getKeepAliveId()));
+        } else if (packet instanceof PacketServerPlayUpdateHealth) {
+            if (firstHealth) {
+                firstHealth = false;
+                if (connectAction != null) {
+                    connectAction.onConnect();
+                }
+            }
         } else if (packet instanceof PacketServerPlayChatMessage && client.isChatEnabled()) {
             PacketServerPlayChatMessage chatMessage = (PacketServerPlayChatMessage) packet;
             LOGGER.info("[{}]: {}", chatMessage.getPosition(), chatMessage.getChat());

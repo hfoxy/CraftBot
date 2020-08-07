@@ -67,7 +67,7 @@ public class BasicClient<C extends Client> implements Client {
     }
 
     @Override
-    public void connect(String host, int port) throws BotConnectionException {
+    public void connect(String host, int port, ConnectAction action) throws BotConnectionException {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
 
         boolean safe = false;
@@ -77,7 +77,7 @@ public class BasicClient<C extends Client> implements Client {
             bootstrap.channel(NioSocketChannel.class);
             bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
 
-            handler = new BasicClientProtocolHandler(this);
+            handler = new BasicClientProtocolHandler(this, action);
             bootstrap.handler(handler);
             LOGGER.debug("client init");
 
@@ -93,12 +93,16 @@ public class BasicClient<C extends Client> implements Client {
                     // Wait until the connection is closed.
                     channel.channel().closeFuture().sync();
                     LOGGER.debug("client stopped");
+
+                    if (getConnection() != null) {
+                        getConnection().disconnect();
+                    }
                 } catch (Exception ex) {
                     LOGGER.error("Unable to stop safely");
                 } finally {
                     workerGroup.shutdownGracefully();
                 }
-            });
+            }, "disconnect-wait-" + getName());
 
             th.start();
         } catch (Exception ex) {
@@ -122,8 +126,8 @@ public class BasicClient<C extends Client> implements Client {
         return new JavaProtocol();
     }
 
-    public Connection createConnection(SocketChannel channel) throws BotProtocolException {
-        return new ServerConnection(this, channel, createProtocol());
+    public Connection createConnection(SocketChannel channel, ConnectAction action) throws BotProtocolException {
+        return new ServerConnection(this, channel, createProtocol(), action);
     }
 
     @Override

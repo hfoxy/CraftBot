@@ -1,0 +1,43 @@
+package me.hfox.craftbot.protocol.play.server;
+
+import me.hfox.craftbot.exception.protocol.BotProtocolException;
+import me.hfox.craftbot.player.Gamemode;
+import me.hfox.craftbot.protocol.ServerPacket;
+import me.hfox.craftbot.protocol.stream.ProtocolBuffer;
+import me.hfox.craftbot.world.Dimension;
+import me.hfox.craftbot.world.LevelType;
+
+import java.io.IOException;
+
+public class PacketServerPlayRespawn implements ServerPacket {
+
+    private Dimension dimension;
+    private long seed;
+    private Gamemode gamemode;
+    private LevelType levelType;
+
+    public Dimension getDimension() {
+        return dimension;
+    }
+
+    public long getSeed() {
+        return seed;
+    }
+
+    public Gamemode getGamemode() {
+        return gamemode;
+    }
+
+    public LevelType getLevelType() {
+        return levelType;
+    }
+
+    @Override
+    public void read(ProtocolBuffer buffer) throws IOException, BotProtocolException {
+        dimension = Dimension.findById(buffer.readInt());
+        seed = buffer.readLong();
+        gamemode = Gamemode.findById(buffer.readUnsignedByte());
+        levelType = LevelType.findByName(buffer.readString());
+    }
+
+}

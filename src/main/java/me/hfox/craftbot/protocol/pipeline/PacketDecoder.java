@@ -19,6 +19,8 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static me.hfox.craftbot.protocol.stream.ProtocolBuffer.getBuffer;
+
 public class PacketDecoder extends ByteToMessageDecoder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PacketDecoder.class);
@@ -31,7 +33,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception {
-        list.add(connection.getProtocol().read(connection, new ProtocolBuffer(byteBuf)));
+        list.add(connection.getProtocol().read(connection, getBuffer(byteBuf)));
     }
 
     @Override

@@ -6,6 +6,8 @@ public interface Chunk {
 
     BlockStateDto getBlockAt(Location location);
 
+    BlockStateDto getBlockAtChunk(int x, int y, int z);
+
     void setBlockAt(Location location, BlockStateDto blockState);
 
     void setBlockAtChunkLocation(int x, int y, int z, int blockId);

@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
+import static me.hfox.craftbot.protocol.stream.ProtocolBuffer.getBuffer;
+
 public class PacketInflater extends ByteToMessageDecoder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PacketInflater.class);
@@ -27,7 +29,7 @@ public class PacketInflater extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws IOException, DataFormatException {
         if (byteBuf.readableBytes() > 0) {
-            ProtocolBuffer buffer = new ProtocolBuffer(byteBuf);
+            ProtocolBuffer buffer = getBuffer(byteBuf);
 
             if (connection.getCompression().isEnabled()) {
                 int dlen = buffer.readVarInt(); // length of uncompressed data

@@ -106,6 +106,7 @@ public class JavaProtocol extends RegistryProtocol implements Protocol {
         registerServer(ProtocolState.PLAY, 0x36, PacketServerPlayPlayerPositionAndLook.class);
         registerServer(ProtocolState.PLAY, 0x37, PacketServerPlayUnlockRecipes.class);
         registerServer(ProtocolState.PLAY, 0x38, PacketServerPlayDestroyEntities.class);
+        registerServer(ProtocolState.PLAY, 0x3B, PacketServerPlayRespawn.class);
         registerServer(ProtocolState.PLAY, 0x3C, PacketServerPlayEntityHeadLook.class);
         registerServer(ProtocolState.PLAY, 0x3D, PacketServerPlaySelectAdvancementTab.class);
         registerServer(ProtocolState.PLAY, 0x3E, PacketServerPlayWorldBorder.class);
@@ -127,6 +128,7 @@ public class JavaProtocol extends RegistryProtocol implements Protocol {
         registerServer(ProtocolState.PLAY, 0x57, PacketServerPlayEntityTeleport.class);
         registerServer(ProtocolState.PLAY, 0x58, PacketServerPlayAdvancements.class);
         registerServer(ProtocolState.PLAY, 0x59, PacketServerPlayEntityProperties.class);
+        registerServer(ProtocolState.PLAY, 0x5A, PacketServerPlayEntityEffect.class);
         registerServer(ProtocolState.PLAY, 0x5B, PacketServerPlayDeclareRecipes.class);
         registerServer(ProtocolState.PLAY, 0x5C, PacketServerPlayTags.class);
     }

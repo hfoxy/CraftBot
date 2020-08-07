@@ -9,13 +9,14 @@ public class BasicClientProtocolHandler extends ProtocolHandler {
 
     private final BasicClient client;
 
-    public BasicClientProtocolHandler(BasicClient client) {
+    public BasicClientProtocolHandler(BasicClient client, ConnectAction connectAction) {
+        super(connectAction);
         this.client = client;
     }
 
     @Override
-    protected Connection createConnection(SocketChannel channel) throws BotProtocolException {
-        return client.createConnection(channel);
+    protected Connection createConnection(SocketChannel channel, ConnectAction action) throws BotProtocolException {
+        return client.createConnection(channel, action);
     }
 
 }

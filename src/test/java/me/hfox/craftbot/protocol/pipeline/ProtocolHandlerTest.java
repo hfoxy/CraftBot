@@ -2,19 +2,14 @@ package me.hfox.craftbot.protocol.pipeline;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.embedded.EmbeddedChannel;
 import me.hfox.craftbot.connection.ServerConnection;
-import me.hfox.craftbot.exception.protocol.BotProtocolException;
 import me.hfox.craftbot.protocol.JavaProtocol;
 import me.hfox.craftbot.protocol.play.client.PacketClientPlayKeepAlive;
-import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class ProtocolHandlerTest {
 
@@ -22,7 +17,7 @@ class ProtocolHandlerTest {
 
     // @Test
     void writeRead() throws Exception {
-        ServerConnection connection = new ServerConnection(null, null, new JavaProtocol());
+        ServerConnection connection = new ServerConnection(null, null, new JavaProtocol(), null);
         connection.getCompression().enable(256);
 
         PacketClientPlayKeepAlive packet = new PacketClientPlayKeepAlive(System.currentTimeMillis());

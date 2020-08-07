@@ -7,19 +7,25 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import me.hfox.craftbot.connection.Connection;
 import me.hfox.craftbot.connection.ServerConnection;
+import me.hfox.craftbot.connection.client.ConnectAction;
 import me.hfox.craftbot.exception.protocol.BotProtocolException;
 import me.hfox.craftbot.protocol.JavaProtocol;
 
 public class ProtocolHandler extends ChannelInitializer<SocketChannel> {
 
+    private final ConnectAction connectAction;
     private Connection connection;
+
+    public ProtocolHandler(ConnectAction connectAction) {
+        this.connectAction = connectAction;
+    }
 
     public Connection getConnection() {
         return connection;
     }
 
-    protected Connection createConnection(SocketChannel channel) throws BotProtocolException {
-        return new ServerConnection(null, channel, new JavaProtocol());
+    protected Connection createConnection(SocketChannel channel, ConnectAction action) throws BotProtocolException {
+        return new ServerConnection(null, channel, new JavaProtocol(), action);
     }
 
     @Override
@@ -30,7 +36,7 @@ public class ProtocolHandler extends ChannelInitializer<SocketChannel> {
             throw new BotProtocolException("Unable to set TCP_NODELAY");
         }
 
-        connection = createConnection(channel);
+        connection = createConnection(channel, connectAction);
 
         channel.pipeline().addLast("timeout", new ReadTimeoutHandler(30));
         channel.pipeline().addLast("splitter", new PacketSplitter());
