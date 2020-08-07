@@ -1,5 +1,6 @@
 package me.hfox.craftbot.protocol.play.server;
 
+import io.netty.buffer.Unpooled;
 import me.hfox.craftbot.exception.protocol.BotProtocolException;
 import me.hfox.craftbot.protocol.ServerPacket;
 import me.hfox.craftbot.protocol.play.server.data.SlotData;
@@ -15,26 +16,31 @@ public class PacketServerPlayDeclareRecipes implements ServerPacket {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PacketServerPlayDeclareRecipes.class);
 
+    private ProtocolBuffer buffer;
+    private boolean read;
+
     private RecipeData[] recipes;
 
-    public RecipeData[] getRecipes() {
+    public RecipeData[] getRecipes() throws IOException {
+        if (read) {
+            return recipes;
+        }
+
+        readPopulate();
         return recipes;
     }
 
     @Override
     public void read(ProtocolBuffer buffer) throws IOException, BotProtocolException {
-        /*byte[] remaining = new byte[buffer.readableBytes()];
-        buffer.readBytes(remaining);
-        //LOGGER.info("Content: {}", remaining);
+        this.buffer = new ProtocolBuffer(Unpooled.buffer());
 
-        FileOutputStream fos = new FileOutputStream(new File("recipe_packet"));
-        DataOutputStream dos = new DataOutputStream(fos);
-        LOGGER.info("Writing {} bytes", remaining.length);
-        dos.writeInt(remaining.length);
-        fos.write(remaining);
-        LOGGER.info("Written {} bytes", remaining.length);
-        dos.close();*/
+        byte[] content = new byte[buffer.readableBytes()];
+        buffer.readBytes(content);
 
+        this.buffer.writeBytes(content);
+    }
+
+    private void readPopulate() throws IOException {
         int recipeCount = buffer.readVarInt();
 
         recipes = new RecipeData[recipeCount];
@@ -104,6 +110,9 @@ public class PacketServerPlayDeclareRecipes implements ServerPacket {
 
             recipes[i] = recipeData;
         }
+
+        read = true;
+        buffer = null;
     }
 
 }

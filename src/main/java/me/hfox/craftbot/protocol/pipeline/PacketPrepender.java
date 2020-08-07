@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 
 public class PacketPrepender extends MessageToByteEncoder<ByteBuf> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(PacketPrepender.class);
+
     private final Connection connection;
 
     public PacketPrepender(Connection connection) {
@@ -18,18 +20,18 @@ public class PacketPrepender extends MessageToByteEncoder<ByteBuf> {
 
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, ByteBuf input, ByteBuf byteBuf) throws Exception {
-        int length = input.readableBytes();
+        try {
+            int length = input.readableBytes();
 
-        ProtocolBuffer buffer = new ProtocolBuffer(byteBuf);
-        if (!connection.getCompression().isEnabled()) {
-            buffer.writeVarInt(length);
+            ProtocolBuffer buffer = new ProtocolBuffer(byteBuf);
+            if (!connection.getCompression().isEnabled()) {
+                buffer.writeVarInt(length);
+            }
+
+            buffer.writeBytes(input);
+        } catch (Exception ex) {
+            LOGGER.error("Unexpected error", ex);
         }
-
-        buffer.writeBytes(input);
     }
 
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        super.exceptionCaught(ctx, cause);
-    }
 }

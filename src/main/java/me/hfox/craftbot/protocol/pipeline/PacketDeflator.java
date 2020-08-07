@@ -34,41 +34,45 @@ public class PacketDeflator extends MessageToByteEncoder<ByteBuf> {
      */
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, ByteBuf inBuf, ByteBuf outBuf) throws Exception {
-        ProtocolBuffer input = new ProtocolBuffer(inBuf);
-        ProtocolBuffer output = new ProtocolBuffer(outBuf);
+        try {
+            ProtocolBuffer input = new ProtocolBuffer(inBuf);
+            ProtocolBuffer output = new ProtocolBuffer(outBuf);
 
-        int length = input.readableBytes();
-        if (connection.getCompression().isEnabled()) {
-            int uncompressedContentLength = input.readableBytes();
-            byte[] content = new byte[uncompressedContentLength];
-            input.readBytes(content);
+            int length = input.readableBytes();
+            if (connection.getCompression().isEnabled()) {
+                int uncompressedContentLength = input.readableBytes();
+                byte[] content = new byte[uncompressedContentLength];
+                input.readBytes(content);
 
-            if (length >= connection.getCompression().getThreshold()) {
-                Deflater deflater = new Deflater();
-                deflater.setInput(content);
-                deflater.finish();
+                if (length >= connection.getCompression().getThreshold()) {
+                    Deflater deflater = new Deflater();
+                    deflater.setInput(content);
+                    deflater.finish();
 
-                byte[] bytes = new byte[length];
-                int len = deflater.deflate(bytes);
-                deflater.end();
+                    byte[] bytes = new byte[length];
+                    int len = deflater.deflate(bytes);
+                    deflater.end();
 
-                byte[] trim = new byte[len];
-                System.arraycopy(bytes, 0, trim, 0, trim.length);
-                content = trim;
-            } else {
-                uncompressedContentLength = 0;
+                    byte[] trim = new byte[len];
+                    System.arraycopy(bytes, 0, trim, 0, trim.length);
+                    content = trim;
+                } else {
+                    uncompressedContentLength = 0;
+                }
+
+                ProtocolBuffer buffer = new ProtocolBuffer(Unpooled.buffer());
+                buffer.writeVarInt(uncompressedContentLength);
+                buffer.writeBytes(content);
+
+                output.writeVarInt(buffer.writerIndex());
+                output.writeBytes(buffer);
+                return;
             }
 
-            ProtocolBuffer buffer = new ProtocolBuffer(Unpooled.buffer());
-            buffer.writeVarInt(uncompressedContentLength);
-            buffer.writeBytes(content);
+            output.writeBytes(input);
+        } catch (Exception ex) {
 
-            output.writeVarInt(buffer.writerIndex());
-            output.writeBytes(buffer);
-            return;
         }
-
-        output.writeBytes(input);
     }
 
 }

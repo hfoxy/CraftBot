@@ -182,10 +182,10 @@ public class ServerConnection implements Connection {
             LOGGER.debug("Read compression threshold as {}", threshold);
         } else if (packet instanceof PacketServerLoginDisconnect) {
             ChatComponent reason = ((PacketServerLoginDisconnect) packet).getReason();
-            LOGGER.info("Disconnected: '{}'", reason);
+            LOGGER.info("[{}] Disconnected: '{}'", client.getName(), reason);
             disconnect();
         } else if (packet instanceof PacketServerPlayKeepAlive) {
-            LOGGER.info("Keepin' alive");
+            LOGGER.info("[{}] Keepin' alive", client.getName());
             writePacket(new PacketClientPlayKeepAlive(((PacketServerPlayKeepAlive) packet).getKeepAliveId()));
         } else if (packet instanceof PacketServerPlayChatMessage && client.isChatEnabled()) {
             PacketServerPlayChatMessage chatMessage = (PacketServerPlayChatMessage) packet;

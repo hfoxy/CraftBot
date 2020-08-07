@@ -88,10 +88,10 @@ public class ChunkReader {
 
     private void setBlock(Chunk chunk, int[] palette, int paletteBlockId, int x, int y, int z) {
         int blockId = palette[paletteBlockId];
-        BlockStateDto blockState = BlockPalette.findById(blockId).orElseThrow(() -> new BotUnknownBlockException(Integer.toString(blockId)));
+        // BlockStateDto blockState = BlockPalette.findById(blockId).orElseThrow(() -> new BotUnknownBlockException(Integer.toString(blockId)));
         // chunk.setBlockAtChunkLocation(location);
         // worldHandler.getWorld().setBlock(location, blockState);
-        chunk.setBlockAtChunkLocation(x, y, z, blockState);
+        chunk.setBlockAtChunkLocation(x, y, z, blockId);
     }
 
 }

@@ -1,6 +1,5 @@
 package me.hfox.craftbot.handling;
 
-import me.hfox.craftbot.connection.Connection;
 import me.hfox.craftbot.connection.client.Client;
 import me.hfox.craftbot.entity.EntityRegistration;
 import me.hfox.craftbot.entity.data.PlayerInfo;
@@ -12,7 +11,9 @@ import me.hfox.craftbot.pathing.Tile;
 import me.hfox.craftbot.protocol.ClientPacket;
 import me.hfox.craftbot.protocol.ServerPacket;
 import me.hfox.craftbot.protocol.play.client.PacketClientPlayEntityAction;
-import me.hfox.craftbot.protocol.play.server.*;
+import me.hfox.craftbot.protocol.play.server.PacketServerPlayDisconnect;
+import me.hfox.craftbot.protocol.play.server.PacketServerPlayJoinGame;
+import me.hfox.craftbot.protocol.play.server.PacketServerPlayPlayerPositionAndLook;
 import me.hfox.craftbot.protocol.play.server.data.entity.EntityAction;
 import me.hfox.craftbot.world.Location;
 import me.hfox.craftbot.world.World;
@@ -26,7 +27,6 @@ import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class ClientHandler {
 
@@ -70,7 +70,7 @@ public class ClientHandler {
     }
 
     public void start() {
-        tickTask = EXECUTOR.scheduleWithFixedDelay(() -> {
+        /*tickTask = EXECUTOR.scheduleWithFixedDelay(() -> {
             Connection connection = client.getConnection();
             if (connection == null || !connection.isConnected()) {
                 stop();
@@ -78,7 +78,7 @@ public class ClientHandler {
             }
 
             tickHandler.run();
-        }, 50L, 50L, TimeUnit.MILLISECONDS);
+        }, 50L, 50L, TimeUnit.MILLISECONDS);*/
     }
 
     public void stop() {

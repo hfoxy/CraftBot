@@ -67,7 +67,7 @@ public class BotCommands {
             targets.add(bot.findByName(targetString).orElseThrow(() -> new CommandUsageException("Unknown client '" + targetString + "'")));
         }
 
-        int delay = 4000;
+        int delay = 1000;
         String cmd = args.getJoinedString(1);
         boolean delayed = cmd.startsWith("connect");
 

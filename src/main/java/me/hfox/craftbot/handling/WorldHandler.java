@@ -26,9 +26,6 @@ public class WorldHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WorldHandler.class);
 
-    private final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
-    private final Executor executor = new ThreadPoolExecutor(10, 1000, 1, TimeUnit.MINUTES, queue);
-
     private final ClientHandler clientHandler;
     private final World world;
     private final ChunkHandler chunkHandler;
@@ -146,7 +143,7 @@ public class WorldHandler {
             });
         }
 
-        executor.execute(() -> chunkHandler.onReceive(packet));
+        chunkHandler.onReceive(packet);
     }
 
 }

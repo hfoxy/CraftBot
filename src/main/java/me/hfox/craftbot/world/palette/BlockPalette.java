@@ -20,6 +20,7 @@ public class BlockPalette {
     private static final Map<Integer, BlockStateDto> BLOCK_STATES = new HashMap<>();
 
     private static int AIR_ID;
+    private static BlockStateDto AIR;
 
     public static void load() throws IOException {
         LOGGER.info("Parsing palette file");
@@ -63,7 +64,12 @@ public class BlockPalette {
     }
 
     public static BlockStateDto getAir() {
-        return findById(AIR_ID).orElse(null);
+        if (AIR != null) {
+            return AIR;
+        }
+
+        AIR = findById(AIR_ID).orElse(null);
+        return AIR;
     }
 
 }

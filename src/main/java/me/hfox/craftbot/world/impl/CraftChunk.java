@@ -17,12 +17,12 @@ public class CraftChunk implements Chunk {
 
     private final int x;
     private final int z;
-    private final BlockStateDto[][][] blocks;
+    private final int[][][] blocks;
 
     public CraftChunk(int x, int z) {
         this.x = x;
         this.z = z;
-        this.blocks = new BlockStateDto[16][256][16];
+        this.blocks = new int[16][256][16];
     }
 
     public int getX() {
@@ -33,7 +33,7 @@ public class CraftChunk implements Chunk {
         return z;
     }
 
-    public BlockStateDto[][][] getBlocks() {
+    public int[][][] getBlocks() {
         return blocks;
     }
 
@@ -79,7 +79,16 @@ public class CraftChunk implements Chunk {
 
         // LOGGER.info("blocks... {} -{}", blocks, "done");
 
-        BlockStateDto state = blocks[location.getChunkBlockX()][location.getBlockY()][location.getChunkBlockZ()];
+        int blockId = blocks[location.getChunkBlockX()][location.getBlockY()][location.getChunkBlockZ()];
+        BlockStateDto state;
+        if (blockId == -1) {
+            state = BlockPalette.getAir();
+        } else {
+            state = BlockPalette
+                    .findById(blockId)
+                    .orElseThrow(() -> new BotUnknownBlockException(Integer.toString(blockId)));
+        }
+
         if (state != null) {
             return state;
         }
@@ -93,17 +102,18 @@ public class CraftChunk implements Chunk {
         Preconditions.checkNotNull(blockState, "blockState should not be null");
 
         checkValid(location);
-        _setBlock(location, blockState);
+        setBlockAtChunkLocation(location.getChunkBlockX(), location.getBlockY(), location.getChunkBlockZ(), blockState);
+    }
+
+    @Override
+    public synchronized void setBlockAtChunkLocation(int x, int y, int z, int blockId) {
+        blocks[x][y][z] = blockId;
     }
 
     @Override
     public void setBlockAtChunkLocation(int x, int y, int z, BlockStateDto blockState) {
         Preconditions.checkNotNull(blockState, "blockState should not be null");
-        blocks[x][y][z] = blockState;
-    }
-
-    private synchronized void _setBlock(Location location, BlockStateDto blockState) {
-        blocks[location.getChunkBlockX()][location.getBlockY()][location.getChunkBlockZ()] = blockState;
+        setBlockAtChunkLocation(x, y, z, blockState.getId());
     }
 
 }
