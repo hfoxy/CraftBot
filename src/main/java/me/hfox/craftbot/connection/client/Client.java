@@ -56,4 +56,6 @@ public interface Client extends CommandSender {
 
     void execute(String command);
 
+    void tick();
+
 }

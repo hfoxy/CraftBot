@@ -4,10 +4,7 @@ import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import me.hfox.craftbot.Bot;
 import me.hfox.craftbot.auth.AccountDto;
-import me.hfox.craftbot.connection.client.session.dto.request.AuthRefreshDto;
-import me.hfox.craftbot.connection.client.session.dto.request.AuthValidateDto;
-import me.hfox.craftbot.connection.client.session.dto.request.AuthenticationAgentDto;
-import me.hfox.craftbot.connection.client.session.dto.request.AuthenticationDto;
+import me.hfox.craftbot.connection.client.session.dto.request.*;
 import me.hfox.craftbot.connection.client.session.dto.response.AuthErrorResponse;
 import me.hfox.craftbot.connection.client.session.dto.response.AuthSessionResponseDto;
 import me.hfox.craftbot.connection.client.session.dto.response.RefreshSessionResponseDto;
@@ -246,7 +243,27 @@ public class YggdrasilSession implements Session {
                 .body(validateDto).header("Content-Type", "application/json").asEmpty().getStatus();
 
         if (validationResult != 204 && validationResult != 200) {
-            throw new BotAuthenticationFailedException("Unable to authenticate with session server: " + validationResult);
+            // throw new BotAuthenticationFailedException("Unable to validate with session server: " + validationResult);
+            setAuthenticated(false);
+            setLastAuthenticated(0);
+            authenticate();
+        }
+
+        String uuid = getUniqueId().toString().replace("-", "");
+        LOGGER.info("Access Token: {}", getAccessToken());
+        LOGGER.info("UUID: {}", uuid);
+        LOGGER.info("Server ID: {}", serverHash);
+        AuthJoinDto joinDto = new AuthJoinDto(
+                getAccessToken(), uuid, serverHash
+        );
+
+        int joinResult = Unirest.post(Bot.getSessionConfiguration().getJoinUrl())
+                .body(joinDto).header("Content-Type", "application/json").asEmpty().getStatus();
+
+
+        LOGGER.info("Join result: {}", joinResult);
+        if (joinResult != 204 && joinResult != 200) {
+            throw new BotAuthenticationFailedException("Unable to authenticate with session server to join: " + validationResult);
         }
     }
 

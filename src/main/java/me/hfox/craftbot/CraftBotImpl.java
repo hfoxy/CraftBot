@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import me.hfox.craftbot.auth.AccountDto;
 import me.hfox.craftbot.auth.AccountsFileDto;
 import me.hfox.craftbot.auth.BotAutoAuthenticator;
@@ -22,11 +23,18 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 public class CraftBotImpl implements CraftBot {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CraftBotImpl.class);
+
+    private static final ThreadFactory THREAD_FACTORY = new ThreadFactoryBuilder().setNameFormat("tick-handler-%d").build();
+    private static final ScheduledExecutorService SCHEDULER = Executors.newScheduledThreadPool(10, THREAD_FACTORY);
 
     private final String name;
     private final String version;
@@ -83,6 +91,16 @@ public class CraftBotImpl implements CraftBot {
 
         autoAuthenticator = new BotAutoAuthenticator(this, accounts);
         autoAuthenticator.start();
+
+        SCHEDULER.scheduleWithFixedDelay(() -> {
+            for (Client client : getClients()) {
+                try {
+                    client.tick();
+                } catch (Exception ex) {
+                    LOGGER.error("Unexpected error", ex);
+                }
+            }
+        }, 50L, 50L, TimeUnit.MILLISECONDS);
     }
 
     @Override

@@ -11,14 +11,12 @@ import me.hfox.craftbot.connection.client.Client;
 import me.hfox.craftbot.connection.client.StatusClient;
 import me.hfox.craftbot.exception.connection.BotConnectionException;
 import me.hfox.craftbot.exception.session.BotAuthenticationFailedException;
-import me.hfox.craftbot.exception.token.TokenFormatException;
 import me.hfox.craftbot.terminal.CommandSender;
 import me.hfox.craftbot.terminal.Level;
 import me.hfox.craftbot.terminal.commands.token.TokenProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -78,7 +76,7 @@ public class BotCommands {
         //
     }
 
-    @Command(aliases = {"connect"}, description = "Connects to a server", min = 2)
+    @Command(aliases = {"connect"}, description = "Connects to a server", min = 2, max = 3)
     public static void connect(CommandSender sender, CommandContext<CommandSender> args) throws CommandException {
         String host = args.getString(1);
         int port = 25565;
@@ -92,9 +90,10 @@ public class BotCommands {
             port = Integer.parseInt(split[1]);
         }
 
+        int interval = args.getInteger(2, 6000);
         Set<Client> targets = getTargets(args.getString(0));
         Iterator<Client> iterator = targets.iterator();
-        loopConnect(iterator, host, port);
+        loopConnect(iterator, host, port, interval);
 
         /*Set<Client> targets = getTargets(args.getString(0));
         Iterator<Client> iterator = targets.iterator();
@@ -110,21 +109,19 @@ public class BotCommands {
         }, 100, delay, TimeUnit.MILLISECONDS);*/
     }
 
-    private static void loopConnect(Iterator<Client> iterator, String host, int port) {
+    private static void loopConnect(Iterator<Client> iterator, String host, int port, int interval) {
         SCHEDULER.schedule(() -> {
             try {
                 if (iterator.hasNext()) {
                     Client client = iterator.next();
                     LOGGER.info("Connecting {} to {}:{}", client.getName(), host, port);
 
-                    client.connect(host, port, () -> {
-                        loopConnect(iterator, host, port);
-                    });
+                    client.connect(host, port, () -> loopConnect(iterator, host, port, interval));
                 }
             } catch (Exception ex) {
                 LOGGER.error("Error connecting", ex);
             }
-        }, 50L, TimeUnit.MILLISECONDS);
+        }, interval, TimeUnit.MILLISECONDS);
     }
 
     private static Set<Client> getTargets(String targetString) throws CommandUsageException {

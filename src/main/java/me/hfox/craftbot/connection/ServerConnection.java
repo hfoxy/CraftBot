@@ -18,6 +18,8 @@ import me.hfox.craftbot.protocol.login.server.PacketServerLoginDisconnect;
 import me.hfox.craftbot.protocol.login.server.PacketServerLoginEncryptionRequest;
 import me.hfox.craftbot.protocol.login.server.PacketServerLoginSetCompression;
 import me.hfox.craftbot.protocol.login.server.PacketServerLoginSuccess;
+import me.hfox.craftbot.protocol.pipeline.PacketEncryptingDecoder;
+import me.hfox.craftbot.protocol.pipeline.PacketEncryptingEncoder;
 import me.hfox.craftbot.protocol.play.client.PacketClientPlayKeepAlive;
 import me.hfox.craftbot.protocol.play.client.PacketClientPlayTeleportConfirm;
 import me.hfox.craftbot.protocol.play.server.*;
@@ -94,7 +96,7 @@ public class ServerConnection implements Connection {
 
     @Override
     public boolean isConnected() {
-        return channel.isOpen();
+        return channel.isActive();
     }
 
     @Override
@@ -126,7 +128,7 @@ public class ServerConnection implements Connection {
 
     @Override
     public void handle(ServerPacket packet) {
-        LOGGER.debug("Received {}", packet.getClass().getSimpleName());
+        // LOGGER.info("Received {}", packet.getClass().getSimpleName());
 
         /*if (!(packet instanceof PacketServerPlayEntityPosition)
                 && !(packet instanceof PacketServerPlayEntityHeadLook)
@@ -159,13 +161,24 @@ public class ServerConnection implements Connection {
                 PublicKey publicKey = CryptoUtils.decodePublicKey(request.getPublicKey());
                 LOGGER.info("Decoded public key");
 
-                String hash = CryptoUtils.getServerIdHash(request.getServerId(), publicKey, secretKey);
+                String hash = CryptoUtils.getServerIdHash(request.getServerId(), secretKey, publicKey);
                 LOGGER.info("Generated server id hash: {}", hash);
 
                 client.getSession().joinServer(hash);
                 LOGGER.info("Joined server!");
 
-                writePacket(new PacketClientLoginEncryptionResponse(secretKey.getEncoded(), request.getVerifyToken()));
+                // writePacket(new PacketClientLoginEncryptionResponse(
+                //         CryptoUtils.encryptData(publicKey, secretKey.getEncoded()),
+                //         CryptoUtils.encryptData(publicKey, request.getVerifyToken())
+                // ));
+
+                writePacket(new PacketClientLoginEncryptionResponse(
+                        CryptoUtils.encryptData(publicKey, secretKey.getEncoded()),
+                        CryptoUtils.encryptData(publicKey, request.getVerifyToken())
+                ));
+
+                getChannel().pipeline().addBefore("splitter", "decrypt", new PacketEncryptingDecoder(CryptoUtils.createNetworkCipher(2, secretKey)));
+                getChannel().pipeline().addBefore("deflator", "encrypt", new PacketEncryptingEncoder(CryptoUtils.createNetworkCipher(1, secretKey)));
             } catch (BotEncryptionException ex) {
                 LOGGER.error("Unable to encrypt", ex);
                 disconnect();
@@ -195,7 +208,9 @@ public class ServerConnection implements Connection {
             LOGGER.info("[{}] Disconnected: '{}'", client.getName(), reason);
             disconnect();
         } else if (packet instanceof PacketServerPlayKeepAlive) {
-            writePacket(new PacketClientPlayKeepAlive(((PacketServerPlayKeepAlive) packet).getKeepAliveId()));
+            long keepAliveId = ((PacketServerPlayKeepAlive) packet).getKeepAliveId();
+            LOGGER.debug("Received keep alive! {}", keepAliveId);
+            writePacket(new PacketClientPlayKeepAlive(keepAliveId));
         } else if (packet instanceof PacketServerPlayUpdateHealth) {
             if (firstHealth) {
                 firstHealth = false;

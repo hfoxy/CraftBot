@@ -1,5 +1,6 @@
 package me.hfox.craftbot.connection.client;
 
+import me.hfox.craftbot.connection.Connection;
 import me.hfox.craftbot.connection.client.session.Session;
 import me.hfox.craftbot.entity.data.Hand;
 import me.hfox.craftbot.entity.data.PlayerInfo;
@@ -159,6 +160,20 @@ public class PlayClient extends BasicClient<PlayClient> {
 
         getConnection().writePacket(new PacketClientHandshake(578, host, port, ProtocolState.LOGIN));
         getConnection().writePacket(new PacketClientLoginStart(getSession().getName()));
+    }
+
+    @Override
+    public void tick() {
+        Connection connection = getConnection();
+        if (connection == null || !connection.isConnected()) {
+            return;
+        }
+
+        super.tick();
+
+        if (clientHandler != null && clientHandler.getTickHandler() != null) {
+            clientHandler.getTickHandler().run();
+        }
     }
 
 }

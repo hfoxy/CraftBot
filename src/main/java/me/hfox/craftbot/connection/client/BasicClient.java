@@ -194,4 +194,9 @@ public class BasicClient<C extends Client> implements Client {
         TerminalReader.handleCommand(command, aphelion, getMe());
     }
 
+    @Override
+    public void tick() {
+        // nothing here
+    }
+
 }

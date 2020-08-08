@@ -81,7 +81,9 @@ public class ClientHandler {
     }
 
     public void stop() {
-        tickTask.cancel(false);
+        if (tickTask != null) {
+            tickTask.cancel(false);
+        }
     }
 
     public void onSend(ClientPacket packet) {
