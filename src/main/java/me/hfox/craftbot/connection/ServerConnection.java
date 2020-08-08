@@ -49,6 +49,7 @@ public class ServerConnection implements Connection {
     private final ConnectAction connectAction;
 
     private boolean firstHealth;
+    private boolean firstDisconnect;
     private boolean exitPoll;
     private Protocol protocol;
 
@@ -60,6 +61,7 @@ public class ServerConnection implements Connection {
         this.packets = new LinkedBlockingQueue<>();
         this.connectAction = action;
         this.firstHealth = true;
+        this.firstDisconnect = true;
         this.packetHandle = new Thread(() -> {
             while (!exitPoll) {
                 ServerPacket packet;
@@ -113,6 +115,13 @@ public class ServerConnection implements Connection {
         }
 
         exitPoll = true;
+
+        if (firstDisconnect) {
+            firstDisconnect = false;
+            if (connectAction != null) {
+                connectAction.onConnect(false);
+            }
+        }
     }
 
     @Override
@@ -215,7 +224,7 @@ public class ServerConnection implements Connection {
             if (firstHealth) {
                 firstHealth = false;
                 if (connectAction != null) {
-                    connectAction.onConnect();
+                    connectAction.onConnect(true);
                 }
             }
         } else if (packet instanceof PacketServerPlayChatMessage && client.isChatEnabled()) {

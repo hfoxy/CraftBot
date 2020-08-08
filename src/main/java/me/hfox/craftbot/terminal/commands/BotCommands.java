@@ -116,7 +116,7 @@ public class BotCommands {
                     Client client = iterator.next();
                     LOGGER.info("Connecting {} to {}:{}", client.getName(), host, port);
 
-                    client.connect(host, port, () -> loopConnect(iterator, host, port, interval));
+                    client.connect(host, port, (connected) -> loopConnect(iterator, host, port, interval));
                 }
             } catch (Exception ex) {
                 LOGGER.error("Error connecting", ex);

@@ -165,15 +165,18 @@ public class YggdrasilSession implements Session {
 
         if (response.getStatus() != 200) {
             AuthErrorResponse errorResponse = response.mapError(AuthErrorResponse.class);
+            String invalidCreds = "";
+
             if (errorResponse != null) {
                 LOGGER.debug("Error! {}", errorResponse.getErrorMessage());
                 if (errorResponse.getErrorMessage() != null && errorResponse.getErrorMessage().toLowerCase().contains("invalid credentials")) {
+                    invalidCreds = ". Invalid credentials";
                     accountDto.setInvalidDetails(true);
                     persist();
                 }
             }
 
-            throw new BotAuthenticationFailedException("Unable to authenticate: Status " + response.getStatus() + " - " + response.getStatusText());
+            throw new BotAuthenticationFailedException("Unable to authenticate: Status " + response.getStatus() + " - " + response.getStatusText() + invalidCreds);
         }
 
         AuthSessionResponseDto sessionDto = response.getBody();
